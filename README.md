@@ -8,13 +8,11 @@
 
 这是一个快速入门 PyTorch 框架的学习仓库，包括 PyTorch 的基本用法与常用模型的搭建等。
 
-This is a repository for quick introduction to PyTorch framework, including the basic usage of PyTorch and the building of common models.
-
 ## 目录
 
 <div align="center">
 
-|名称|数据集|准确率|解释|
+|名称（name）|数据集（datasets）|准确率（accuracy）|解释（explain）|
 |--|--|--|--|
 |[PyTorch基础](./introduce/pytorch_basics.ipynb)|/|/|PyTorch语法与概念|
 |[线性回归](./introduce/linear_regression.ipynb)|/|/||
@@ -28,7 +26,7 @@ This is a repository for quick introduction to PyTorch framework, including the 
 |[GoogLeNet](./networks/googlenet.ipynb)|[CIFAR10](./data/CIFAR10/)|aux_logits=True: 86.99%<br />aux_logits=False: 85.88%|首次引入Inception结构|
 |[ResNet](./networks/resnet.ipynb)|[CIFAR10](./data/CIFAR10/)|89.89%|引入残差块|
 |[Networks Comparison with TensorBoard](./networks/comparison.ipynb)|[CIFAR10](./data/CIFAR10/)|/|多个CNN模型的对比|
-|[Object Detection with YOLOv5s](./video_detection.ipynb)|[VIDEOS](./data/VIDEOS/input/)|||
+|[Object Detection](./video_detection.ipynb)|[VIDEOS](./data/VIDEOS/input/)|/|基于YOLOv5s模型的目标检测类|
 
 </div>
 
