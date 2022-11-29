@@ -1,4 +1,4 @@
-# pytorch-tutorial🔖
+# easy-pytorch🔖
 
 <p align='center'>
     <a href="https://github.com/pytorch"> 
@@ -26,7 +26,7 @@
 |[GoogLeNet](./networks/googlenet.ipynb)|[CIFAR10](./data/CIFAR10/)|aux_logits=True: 86.99%<br />aux_logits=False: 85.88%|首次引入Inception结构|
 |[ResNet](./networks/resnet.ipynb)|[CIFAR10](./data/CIFAR10/)|89.89%|引入残差块|
 |[Networks Comparison with TensorBoard](./networks/comparison.ipynb)|[CIFAR10](./data/CIFAR10/)|/|多个CNN模型的对比|
-|[Object Detection](./video_detection.ipynb)|[VIDEOS](./data/VIDEOS/input/)|/|基于YOLOv5s模型的目标检测类|
+|[Object Detection](./video_detection.ipynb)|[VIDEOS](./data/VIDEOS/input/)|/|基于YOLOv5s模型的目标检测|
 
 </div>
 
