@@ -3,6 +3,12 @@ __pycache__/
 *.py[cod]
 *$py.class
 
+# models/ & data/
+models/yolov5
+models/yolov5s.pt
+data/CIFAR10/cifar-10-python.tar.gz
+data/CIFAR10/cifar-10-batches-py/
+
 # C extensions
 *.so
 .vscode/
@@ -27,8 +33,6 @@ share/python-wheels/
 .installed.cfg
 *.egg
 MANIFEST
-cifar-10-python.tar.gz
-cifar-10-batches-py/
 
 # PyInstaller
 #  Usually these files are written by a python script from a template
