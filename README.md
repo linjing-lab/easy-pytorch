@@ -30,7 +30,7 @@
 
 </div>
 
-These cases were trained on `NVIDIA GeForce MX250`.
+These cases were trained on NVIDIA GeForce MX250.
 
 ## LICENSE
 [MIT LICENSE](./LICENSE)
