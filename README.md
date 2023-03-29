@@ -1,7 +1,7 @@
 # easy-pytorch🔖
 
 <p align='center'>
-    <a href="https://github.com/pytorch"> 
+    <a href="https://pytorch.org/"> 
         <img src="https://www.vectorlogo.zone/logos/pytorch/pytorch-icon.svg"> 
     </a>
 </p>
