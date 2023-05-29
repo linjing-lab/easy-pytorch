@@ -1,10 +1,6 @@
 # Copyright (c) 2023 linjing-lab
 
-import torch
-import random
-import numpy
-import gc
-import sortingx
+import torch, random, numpy, gc, sortingx
 from joblib import parallel_backend
 from collections import OrderedDict
 from ._typing import TabularData, Tuple, Dict, Optional, Any
@@ -64,8 +60,8 @@ class BaseModel:
     :param device: Any, device configured by common models and general box.
     :param activation: Any, activated function configured by common models and general box.
     :param criterion: Any, loss function determined by common models and general box.
-    :param solver: str, optimization function coordinated with `torch.optim.lr_scheduler`. default: adam. (modified more params in `_solver`.)
-    :param batch_size: int, batch size of dataset in one training process. default: 32.
+    :param solver: str, optimization coordinated with `torch.optim.lr_scheduler`. default: adam. (modified more params in `_solver`.)
+    :param batch_size: int, batch size of tabular dataset in one training process. default: 32.
     :param learning_rate_init: float, initialize the learning rate of the optimizer. default: 1e-3.
     :param lr_scheduler: str | None, set the learning rate scheduler integrated with the optimizer. default: None. (modifier more params in `_scheduler`.)
     '''

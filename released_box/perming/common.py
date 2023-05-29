@@ -95,15 +95,15 @@ class Binarier(BaseModel):
                  lr_scheduler: Optional[str]=None) -> None:
 
         super(Binarier, self).__init__(input_, 
-                                     2, 
-                                     hidden_layer_sizes, 
-                                     torch.device("cuda" if torch.cuda.is_available() else "cpu"), 
-                                     self._activate(activation), 
-                                     self._criterion(criterion), 
-                                     solver, 
-                                     batch_size, 
-                                     learning_rate_init, 
-                                     lr_scheduler)
+                                       2, 
+                                       hidden_layer_sizes, 
+                                       torch.device("cuda" if torch.cuda.is_available() else "cpu"), 
+                                       self._activate(activation), 
+                                       self._criterion(criterion), 
+                                       solver, 
+                                       batch_size, 
+                                       learning_rate_init, 
+                                       lr_scheduler)
 
     def _activate(self, activation: str):
         '''
@@ -166,15 +166,15 @@ class Mutipler:
                  lr_scheduler: Optional[str]=None) -> None:
         
         super(Mutipler, self).__init__(input_, 
-                                      num_classes, 
-                                      hidden_layer_sizes, 
-                                      torch.device("cuda" if torch.cuda.is_available() else "cpu"), 
-                                      self._activate(activation), 
-                                      self._criterion(criterion), 
-                                      solver, 
-                                      batch_size, 
-                                      learning_rate_init, 
-                                      lr_scheduler)
+                                       num_classes, 
+                                       hidden_layer_sizes, 
+                                       torch.device("cuda" if torch.cuda.is_available() else "cpu"), 
+                                       self._activate(activation), 
+                                       self._criterion(criterion), 
+                                       solver, 
+                                       batch_size, 
+                                       learning_rate_init, 
+                                       lr_scheduler)
         assert num_classes >= 2
 
     def _activate(self, activation: str):

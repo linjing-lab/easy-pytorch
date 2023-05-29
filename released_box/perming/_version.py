@@ -8,8 +8,7 @@ def parse_torch_version(version_info: str):
     '''
     if version_info.find('cu') != -1:
         version_cu = version_info.split('+')
-        version = tuple(version_cu[0].split('.'))
-        cuda_info = version_cu[1]
-        return version, cuda_info
+        version = version_cu[0].split('.')
+        return version, version_cu[1]
     else:
         raise Exception('Please refer to https://pytorch.org/get-started/locally/ for PyTorch with cuda version compatible with your windows computer.')

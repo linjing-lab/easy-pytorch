@@ -13,8 +13,8 @@ class Box(BaseModel):
     :param activation: str, configure function that activates the hidden layer. default: relu.
     :param inplace_on: bool, whether to use `inplace=True` on activation. default: False.
     :param criterion: str, loss function determined by different learning problem. default: CrossEntropyLoss.
-    :param solver: str, optimization function coordinated with `torch.optim.lr_scheduler`. default: adam.
-    :param batch_size: int, batch size of dataset in one training process. default: 32.
+    :param solver: str, optimization coordinated with `torch.optim.lr_scheduler`. default: adam.
+    :param batch_size: int, batch size of tabular dataset in one training process. default: 32.
     :param learning_rate_init: float, initialize the learning rate of the optimizer. default: 1e-3.
     :param lr_scheduler: str | None, set the learning rate scheduler integrated with the optimizer. default: None.
     '''
@@ -29,7 +29,7 @@ class Box(BaseModel):
                  criterion: str='CrossEntropyLoss', # criterion='MSELoss'
                  solver: str='adam', 
                  batch_size: int=32, 
-                 learning_rate_init: float=1e-3,
+                 learning_rate_init: float=1e-2,
                  lr_scheduler: Optional[str]=None) -> None:
         
         super(Box, self).__init__(input_, 
@@ -62,11 +62,11 @@ class Box(BaseModel):
         :param activation: str, "relu", "tanh", "sigmoid", "rrelu", "leaky_relu", "prelu", "softplus", "elu", "celu".
         :param inplace_on: bool, whether to use `inplace=True` on activations. default: False.
         '''
-        if activation == 'relu':
+        if activation == 'relu': # most use
             return torch.nn.ReLU(inplace=inplace_on)
         elif activation == 'tanh':
             return torch.nn.Tanh()
-        elif activation == 'sigmoid':
+        elif activation == 'sigmoid': # can be used in classification = 2
             return torch.nn.Sigmoid()
         elif activation == 'rrelu':
             return torch.nn.RReLU(inplace=inplace_on)
