@@ -91,7 +91,7 @@ class BaseModel:
         self.batch_size: int = batch_size
         self.lr: float = learning_rate_init
         self.model = MLP(self.input, self.num_classes, hidden_layer_sizes, self.activation).to(self.device)
-        if parse_torch_version(torch.__version__)[0] >= ('2', '0', '0'):
+        if parse_torch_version(torch.__version__)[0] >= ['2', '0', '0']:
             self.model = torch.compile(self.model)
         self.solver = self._solver(solver)
         self.lr_scheduler = self._scheduler(lr_scheduler)
