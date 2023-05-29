@@ -166,7 +166,8 @@ class BaseModel:
             assert len(self.unique) == self.num_classes, "Please ensure `num_classes` is equal to `len(numpy.unique(labels))`."
             self.indices = dict(zip(self.unique, range(self.num_classes)))
             target = numpy.array([self.indices[value] for value in target], dtype=numpy.int8)
-        assert str(target.dtype).startswith("float"), "Please ensure target.dtype in any float type of numpy.dtype"
+        else:
+            assert str(target.dtype).startswith("float"), "Please ensure target.dtype in any float type of numpy.dtype"
         train_, test_, val_ = train_test_val_split(features, target, ratio_set, random_seed)
         self.train_loader = torch.utils.data.DataLoader(TabularDataset(train_['features'], train_['target'], self.model.squeeze), batch_size=self.batch_size, shuffle=True, num_workers=worker_set['train'], )
         self.test_loader = torch.utils.data.DataLoader(TabularDataset(test_['features'], test_['target'], self.model.squeeze), batch_size=self.batch_size, shuffle=True, num_workers=worker_set['test'])

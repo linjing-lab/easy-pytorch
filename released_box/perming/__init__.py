@@ -26,4 +26,4 @@ COMMON_MODELS = {
     'Multi-classification': Mutipler
 }
 
-__version__ = '1.1.0'
+__version__ = '1.1.1'
