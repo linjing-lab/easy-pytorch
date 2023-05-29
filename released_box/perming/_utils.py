@@ -150,7 +150,7 @@ class BaseModel:
                     worker_set: Dict[str, int]={'train': 8, 'test': 2, 'val': 1},
                     random_seed: Optional[int]=None) -> None:
         '''
-        Encapsulate Dataset to DataLoader from Scratch.
+        Encapsulate Dataset to DataLoader from Tabular Dataset.
         :param features: TabularData, composed of n-row samples and m-column features.
         :param target: TabularData, consists of correct labels or values with size at n.
         :param ratio_set: Dict[str, int], stores the proportion of train-set, test-set and val-set. default: {'train': 7, 'test': 2, 'val': 1}.

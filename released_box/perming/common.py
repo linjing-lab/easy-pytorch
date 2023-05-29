@@ -23,7 +23,7 @@ class Regressier(BaseModel):
                  criterion: str='MSELoss',
                  solver: str='adam', 
                  batch_size: int=32, 
-                 learning_rate_init: float=1e-3,
+                 learning_rate_init: float=1e-2,
                  lr_scheduler: Optional[str]=None) -> None:
 
         super(Regressier, self).__init__(input_, 
@@ -91,7 +91,7 @@ class Binarier(BaseModel):
                  criterion: str='BCELoss',
                  solver: str='adam', 
                  batch_size: int=32, 
-                 learning_rate_init: float=1e-3,
+                 learning_rate_init: float=1e-2,
                  lr_scheduler: Optional[str]=None) -> None:
 
         super(Binarier, self).__init__(input_, 
@@ -162,7 +162,7 @@ class Mutipler:
                  criterion: str='CrossEntropyLoss',
                  solver: str='adam', 
                  batch_size: int=32, 
-                 learning_rate_init: float=1e-3,
+                 learning_rate_init: float=1e-2,
                  lr_scheduler: Optional[str]=None) -> None:
         
         super(Mutipler, self).__init__(input_, 
