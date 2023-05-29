@@ -47,7 +47,7 @@ class Box(BaseModel):
     def _device(self, option: str) -> None:
         '''
         Set Device for Model and Training.
-        :param option: str, "cuda" or "cpu".
+        :param option: device configuration. str, "cuda" or "cpu".
         '''
         if option == "cuda":
             return torch.device(option if torch.cuda.is_available() else "cpu")

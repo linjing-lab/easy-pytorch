@@ -35,10 +35,12 @@ class MLP(torch.nn.Module):
         super(MLP, self).__init__()
         self.squeeze = False if num_classes > 1 else True
         if hidden_layer_sizes:
+            assert hidden_layer_sizes[0] > 0, "Please ensure any layer of hidden_layer_sizes > 0"
             model_layers, hidden_length = OrderedDict(), len(hidden_layer_sizes)
             model_layers['Linear0'] = torch.nn.Linear(input_, hidden_layer_sizes[0])
             model_layers['Activation0'] = activation
             for index in range(1, hidden_length):
+                assert hidden_layer_sizes[index] > 0, "Please ensure any layer of hidden_layer_sizes > 0"
                 linear_, activation_ = "Linear" + str(index), "Activation" + str(index)
                 model_layers[linear_] = torch.nn.Linear(hidden_layer_sizes[index - 1], hidden_layer_sizes[index])
                 model_layers[activation_] = activation
@@ -79,6 +81,8 @@ class BaseModel:
 
         assert input_ > 0
         assert num_classes > 0
+        assert batch_size > 0
+        assert learning_rate_init > 0
         self.input: int = input_
         self.num_classes: int = num_classes
         self.activation = activation
@@ -162,6 +166,7 @@ class BaseModel:
             assert len(self.unique) == self.num_classes, "Please ensure `num_classes` is equal to `len(numpy.unique(labels))`."
             self.indices = dict(zip(self.unique, range(self.num_classes)))
             target = numpy.array([self.indices[value] for value in target], dtype=numpy.int8)
+        assert str(target.dtype).startswith("float"), "Please ensure target.dtype in any float type of numpy.dtype"
         train_, test_, val_ = train_test_val_split(features, target, ratio_set, random_seed)
         self.train_loader = torch.utils.data.DataLoader(TabularDataset(train_['features'], train_['target'], self.model.squeeze), batch_size=self.batch_size, shuffle=True, num_workers=worker_set['train'], )
         self.test_loader = torch.utils.data.DataLoader(TabularDataset(test_['features'], test_['target'], self.model.squeeze), batch_size=self.batch_size, shuffle=True, num_workers=worker_set['test'])
@@ -174,11 +179,12 @@ class BaseModel:
                   n_jobs: int=-1) -> None:
         '''
         Training and Validation with `train_loader` and `val_container`.
-        :param num_epochs: int, training epochs for `self.model`. default: 5.
+        :param num_epochs: int, training epochs for `self.model`. default: 2.
         :param interval: int, console output interval. default: 100.
         :param backend: str, "threading", "multiprocessing, 'locky'. default: "threading".
         :param n_jobs: int, accelerate processing of validation. default: -1.
         '''
+        assert num_epochs > 0 and interval > 0
         assert n_jobs == -1 or n_jobs > 0
         total_step = len(self.train_loader)
         self._set_container(backend, n_jobs)
@@ -189,7 +195,7 @@ class BaseModel:
                 features = features.to(self.device)
                 target = target.to(self.device)
 
-                # froward pass
+                # forward pass
                 outputs = self.model(features)
                 self.train_loss = self.criterion(outputs, target)
 
@@ -231,8 +237,8 @@ class BaseModel:
                 if self.num_classes >= 2:
                     _, predicted = torch.max(outputs.data, 1)
                     for index, value in enumerate(predicted):
-                        self.correct_class[self.unique[value]][1] += 1
-                        self.correct_class[self.unique[value]][0] += (value == target[index]).item()
+                        self.correct_class[self.unique[value]][1] += 1 # record total numbers of each class
+                        self.correct_class[self.unique[value]][0] += (value == target[index]).item() # record total true numbers of each class
                     correct += (predicted == target).sum().item()
                 self.test_loss += self.criterion(outputs, target)
             self.test_loss /= test_loader_step
@@ -241,9 +247,9 @@ class BaseModel:
     
     def save(self, show: bool=True, dir: str='./model') -> None:
         '''
-        Save Model Checkpoint with Classifier.
+        Save Model Checkpoint with Classifier and Regressier.
         :param show: bool, whether to show `model.state_dict()`. default: True.
-        :param dir: str, model save to. default: './model'.
+        :param dir: str, model save to dir. default: './model'.
         '''
         if show:
             print(self.model.state_dict())
@@ -251,9 +257,9 @@ class BaseModel:
 
     def load(self, show: bool=True, dir: str='./model') -> None:
         '''
-        Load Model Checkpoint to Classifier.
+        Save Model Checkpoint with Classifier and Regressier.
         :param show: bool, whether to show `model.state_dict()`. default: True.
-        :param dir: str, model load from. default: './model'.
+        :param dir: str, model load from dir. default: './model'.
         '''
         params = torch.load(dir)
         self.model.load_state_dict(params)
@@ -264,7 +270,7 @@ class BaseModel:
         '''
         Pack Test Returned Data including `correct_class` and returned result of `sortingx.[method]()`.
         :param by: str, choose which way to sort the order of 'correct_class'.
-        :param kernel: str, choose which kernel used for sorting.
+        :param kernel: str, choose which kernel used for sorting `correct_class.items()`.
         :param state: bool, choose the state when `correct_class` is sorting.
         '''
         assert kernel in sortingx.__all__, "Please ensure kernel is sortingx.__all__."
@@ -297,8 +303,8 @@ class BaseModel:
     def _set_container(self, backend: str, n_jobs: int) -> None:
         '''
         Acquire Validation Container with `parallel_backend` at `n_jobs`.
-        :param backend: str, "threading", "multiprocessing, 'locky'. default: "threading".
-        :param n_jobs: int, set jobs for backend.
+        :param backend: str, "threading", "multiprocessing, 'locky'.
+        :param n_jobs: int, set jobs with backend to accelerate process.
         '''
         with parallel_backend(backend, n_jobs=n_jobs):
             val_iter, self.val_container = iter(self.val_loader), []
