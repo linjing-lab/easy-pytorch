@@ -12,7 +12,7 @@ class Regressier(BaseModel):
     :param criterion: str, loss function determined by different learning problem. default: MSELoss.
     :param solver: str, optimization function initialized with `learning_rate_init`. default: adam.
     :param batch_size: int, batch size of dataset in one training process. default: 32.
-    :param learning_rate_init: float, initialize the learning rate of the optimizer. default: 1e-3.
+    :param learning_rate_init: float, initialize the learning rate of the optimizer. default: 1e-2.
     :param lr_scheduler: str | None, set the learning rate scheduler integrated with the optimizer. default: None.
     '''
     def __init__(self, 
@@ -77,10 +77,10 @@ class Binarier(BaseModel):
     :param input_: int, features' dimension of tabular data is input_.
     :param hidden_layer_sizes: Tuple[int], configure the size of each hidden layer. default: (100,).
     :param activation: str, configure function that activates the hidden layer. default: relu.
-    :param criterion: str, loss function determined by different learning problem. default: CrossEntropyLoss.
+    :param criterion: str, loss function determined by different learning problem. default: BCELoss.
     :param solver: str, optimization function coordinated with `torch.optim.lr_scheduler`. default: adam.
     :param batch_size: int, batch size of dataset in one training process. default: 32.
-    :param learning_rate_init: float, initialize the learning rate of the optimizer. default: 1e-3.
+    :param learning_rate_init: float, initialize the learning rate of the optimizer. default: 1e-2.
     :param lr_scheduler: str | None, set the learning rate scheduler integrated with the optimizer. default: None.
     '''
     def __init__(self, 
@@ -150,7 +150,7 @@ class Mutipler:
     :param criterion: str, loss function determined by different learning problem. default: CrossEntropyLoss.
     :param solver: str, optimization function coordinated with `torch.optim.lr_scheduler`. default: adam.
     :param batch_size: int, batch size of dataset in one training process. default: 32.
-    :param learning_rate_init: float, initialize the learning rate of the optimizer. default: 1e-3.
+    :param learning_rate_init: float, initialize the learning rate of the optimizer. default: 1e-2.
     :param lr_scheduler: str | None, set the learning rate scheduler integrated with the optimizer. default: None.
     '''
     def __init__(self, 
@@ -164,7 +164,7 @@ class Mutipler:
                  batch_size: int=32, 
                  learning_rate_init: float=1e-2,
                  lr_scheduler: Optional[str]=None) -> None:
-        
+
         super(Mutipler, self).__init__(input_, 
                                        num_classes, 
                                        hidden_layer_sizes, 

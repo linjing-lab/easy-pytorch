@@ -15,7 +15,7 @@ class Box(BaseModel):
     :param criterion: str, loss function determined by different learning problem. default: CrossEntropyLoss.
     :param solver: str, optimization coordinated with `torch.optim.lr_scheduler`. default: adam.
     :param batch_size: int, batch size of tabular dataset in one training process. default: 32.
-    :param learning_rate_init: float, initialize the learning rate of the optimizer. default: 1e-3.
+    :param learning_rate_init: float, initialize the learning rate of the optimizer. default: 1e-2.
     :param lr_scheduler: str | None, set the learning rate scheduler integrated with the optimizer. default: None.
     '''
     def __init__(self, 

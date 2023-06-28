@@ -39,7 +39,7 @@ setup(
         'Source': 'https://github.com/linjing-lab/easy-pytorch/tree/main/released_box/perming',
         'Tracker': 'https://github.com/linjing-lab/easy-pytorch/issues',
     },
-    classifiers = [
+    classifiers=[
         'Development Status :: 5 - Production/Stable',
         'Intended Audience :: Developers',
         'Intended Audience :: Education',
@@ -54,13 +54,12 @@ setup(
         'Topic :: Software Development',
         'Topic :: Software Development :: Libraries',
         'Topic :: Software Development :: Libraries :: Python Modules',
+        'Topic :: Scientific/Engineering',
         'Topic :: Scientific/Engineering :: Artificial Intelligence',
     ],
-    install_requires = [
-        "polars[pandas]>=0.17.0",
+    install_requires=[
         "numpy>=1.21.0",
-        'sortingx>=1.2.2',
-        'joblib>=1.1.0'
+        "joblib>=1.1.0"
     ]
-    # extras_require = []
+    # extras_require=[]
 )

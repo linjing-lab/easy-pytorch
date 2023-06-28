@@ -1,6 +1,6 @@
 # Copyright (c) 2023 linjing-lab
 
-import torch, random, numpy, gc, sortingx
+import torch, random, numpy, gc
 from joblib import parallel_backend
 from collections import OrderedDict
 from ._typing import TabularData, Tuple, Dict, Optional, Any
@@ -33,7 +33,7 @@ class MLP(torch.nn.Module):
     '''
     def __init__(self, input_: int, num_classes: int, hidden_layer_sizes: Tuple[int], activation) -> None:
         super(MLP, self).__init__()
-        self.squeeze = False if num_classes > 1 else True
+        self.squeeze: bool = False if num_classes > 1 else True
         if hidden_layer_sizes:
             assert hidden_layer_sizes[0] > 0, "Please ensure any layer of hidden_layer_sizes > 0"
             model_layers, hidden_length = OrderedDict(), len(hidden_layer_sizes)
@@ -52,7 +52,7 @@ class MLP(torch.nn.Module):
     def forward(self, x):
         output = self.mlp(x)
         return output.squeeze(-1) if self.squeeze else output
-    
+
 class BaseModel:
     '''
     Basic Model for Configuring Common Models and General Box.
@@ -62,9 +62,9 @@ class BaseModel:
     :param device: Any, device configured by common models and general box.
     :param activation: Any, activated function configured by common models and general box.
     :param criterion: Any, loss function determined by common models and general box.
-    :param solver: str, optimization coordinated with `torch.optim.lr_scheduler`. default: adam. (modified more params in `_solver`.)
-    :param batch_size: int, batch size of tabular dataset in one training process. default: 32.
-    :param learning_rate_init: float, initialize the learning rate of the optimizer. default: 1e-3.
+    :param solver: str, optimization coordinated with `torch.optim.lr_scheduler`. (modified more params in `_solver`.)
+    :param batch_size: int, batch size of tabular dataset in one training process.
+    :param learning_rate_init: float, initialize the learning rate of the optimizer.
     :param lr_scheduler: str | None, set the learning rate scheduler integrated with the optimizer. default: None. (modifier more params in `_scheduler`.)
     '''
     def __init__(self,
@@ -79,10 +79,10 @@ class BaseModel:
                  learning_rate_init: float,
                  lr_scheduler: Optional[str]=None) -> None:
 
-        assert input_ > 0
-        assert num_classes > 0
-        assert batch_size > 0
-        assert learning_rate_init > 0
+        assert input_ > 0, 'BaseModel need samples with dataset features named input_ > 0.'
+        assert num_classes > 0, 'Supervised learning problems with num_classes ranges from (1, 2, 3, ...).'
+        assert batch_size > 0, 'Batch size initialized with int value mostly 2^n(n=1, 2, 3), like 64, 128, 256.'
+        assert learning_rate_init > 0 and learning_rate_init < 1.0, 'Please assert learning rate initialized value in (0, 1.0).'
         self.input: int = input_
         self.num_classes: int = num_classes
         self.activation = activation
@@ -151,23 +151,29 @@ class BaseModel:
                     random_seed: Optional[int]=None) -> None:
         '''
         Encapsulate Dataset to DataLoader from Tabular Dataset.
-        :param features: TabularData, composed of n-row samples and m-column features.
-        :param target: TabularData, consists of correct labels or values with size at n.
-        :param ratio_set: Dict[str, int], stores the proportion of train-set, test-set and val-set. default: {'train': 7, 'test': 2, 'val': 1}.
+        :param features: TabularData, composed of n-row samples and m-column features: (n_samples, n_features).
+        :param target: TabularData, consists of correct labels or values: (n_samples,) or (n_samples, n_outputs).
+        :param ratio_set: Dict[str, int], stores the proportion of train-set, test-set and val-set. default: {'train': 8, 'test': 1, 'val': 1}.
         :param worker_set: Dict[str, int], load the configuration of DataLoader with multi-threaded. default: {'train': 8, 'test': 2, 'val': 1}.
         :param random_seed: int | None, random.seed(random_seed) used for fixed random datasets. default: None.
         '''
         assert ratio_set['train'] > 0 and ratio_set['test'] > 0 and ratio_set['val'] > 0
         assert ratio_set['train'] > 4 * ratio_set['test'], "The training set needs to be larger than the test set."
         assert ratio_set['train'] + ratio_set['test'] + ratio_set['val'] == 10, "The sum of 3 datasets' ratio needs to be 10."
-        assert features.shape[1] == self.input, "Please ensure `input_` is equal to `features.shape[1]`."
-        if self.num_classes >= 2:
-            self.unique = numpy.unique(target)
-            assert len(self.unique) == self.num_classes, "Please ensure `num_classes` is equal to `len(numpy.unique(labels))`."
-            self.indices = dict(zip(self.unique, range(self.num_classes)))
-            target = numpy.array([self.indices[value] for value in target], dtype=numpy.int8)
-        else:
-            assert str(target.dtype).startswith("float"), "Please ensure target.dtype in any float type of numpy.dtype"
+        assert isinstance(features, TabularData) and features.ndim == 2, 'Please ensure features with dimension at (n_samples, n_features).'
+        assert features.shape[1] > 1 and features.shape[1] == self.input, "Please ensure `input_` is equal to `features.shape[1]`."
+        assert isinstance(target, TabularData), "Please ensure target format at numpy.ndarray noted as TabularData."
+        if isinstance(target[0], TabularData): # (n_samples, n_outputs)
+            raise RuntimeError("data_loader not support target with (n_samples, n_ouputs) yet.")
+        else: # (n_samples,)
+            assert len(target.shape) == 1 and target.shape[0] > 0, "Please ensure target is 1d scalar value."
+            if self.num_classes >= 2:
+                self.unique = numpy.unique(target) # int indexes -> any class with single value noted
+                assert len(self.unique) == self.num_classes, "Please ensure `num_classes` is equal to `len(numpy.unique(labels))`."
+                self.indices = dict(zip(self.unique, range(self.num_classes))) # original classes -> int indexes
+                target = numpy.array([self.indices[value] for value in target], dtype=numpy.int8) # adjust int8 -> any int dtype
+            else:
+                assert str(target.dtype).startswith("float"), "Please ensure target.dtype in any float type of numpy.dtype"
         train_, test_, val_ = train_test_val_split(features, target, ratio_set, random_seed)
         self.train_loader = torch.utils.data.DataLoader(TabularDataset(train_['features'], train_['target'], self.model.squeeze), batch_size=self.batch_size, shuffle=True, num_workers=worker_set['train'], )
         self.test_loader = torch.utils.data.DataLoader(TabularDataset(test_['features'], test_['target'], self.model.squeeze), batch_size=self.batch_size, shuffle=True, num_workers=worker_set['test'])
@@ -182,11 +188,11 @@ class BaseModel:
         Training and Validation with `train_loader` and `val_container`.
         :param num_epochs: int, training epochs for `self.model`. default: 2.
         :param interval: int, console output interval. default: 100.
-        :param backend: str, "threading", "multiprocessing, 'locky'. default: "threading".
+        :param backend: str, "threading", "multiprocessing, "locky". default: "threading".
         :param n_jobs: int, accelerate processing of validation. default: -1.
         '''
-        assert num_epochs > 0 and interval > 0
-        assert n_jobs == -1 or n_jobs > 0
+        assert num_epochs > 0 and interval > 0, 'With num_epochs > 0 and interval > 0 to train parameters into outputs.'
+        assert n_jobs == -1 or n_jobs > 0, 'Take full jobs with setting n_jobs=-1 or manually set nums of jobs.'
         total_step = len(self.train_loader)
         self._set_container(backend, n_jobs)
         for epoch in range(num_epochs):
@@ -204,7 +210,7 @@ class BaseModel:
                 self.solver.zero_grad()
                 self.train_loss.backward()
                 _ = self.solver.step() if self.lr_scheduler == None else self.lr_scheduler.step()
-                
+
                 # validation with val_container
                 self.val_loss = 0
                 with parallel_backend(backend, n_jobs=n_jobs):
@@ -216,16 +222,14 @@ class BaseModel:
 
                 # console print
                 if (i + 1) % interval == 0:
-                    print ('Epoch [{}/{}], Step [{}/{}], Training Loss: {:.4f}, Validation Loss: {:.4f}' .format(epoch+1, num_epochs, i+1, total_step, self.train_loss.item(), self.val_loss.item()))
+                    print ('Epoch [{}/{}], Step [{}/{}], Training Loss: {:.4f}, Validation Loss: {:.4f}'.format(epoch+1, num_epochs, i+1, total_step, self.train_loss.item(), self.val_loss.item()))
 
     def test(self, 
-             sort_by: str='accuracy', 
-             sort_kernel: str='bubble', 
+             sort_by: str='accuracy',
              sort_state: bool=True):
         '''
-        Test with Initialized Configuration. `accuracy > 0`, 'correct_class != None' and the underline keywords only appears when `num_classes >= 2`.
+        Test with Initialized Configuration. `accuracy > 0`, 'correct_class != None' and keywords only appears when `num_classes >= 2`.
         :param sort_by: str, 'accuracy', 'numbers', 'num-total'. default: 'accuracy'.
-        :param sort_kernel: 'bubble', 'insert', 'shell', 'heap', 'quick', 'merge'. default: 'bubble'.
         :param sort_state: bool, whether to use descending order when sorting. default: True.
         '''
         with torch.no_grad():
@@ -244,7 +248,7 @@ class BaseModel:
                 self.test_loss += self.criterion(outputs, target)
             self.test_loss /= test_loader_step
             print('loss of {0} on the {1} test dataset: {2}. accuracy: {3:.4f} %'.format(self.__class__.__name__, test_total, self.test_loss.item(), 100 * correct / test_total))
-        return OrderedDict(self._packing(sort_by, sort_kernel, sort_state))
+        return OrderedDict(self._packing(sort_by, sort_state))
     
     def save(self, show: bool=True, dir: str='./model') -> None:
         '''
@@ -267,15 +271,12 @@ class BaseModel:
         if show:
             print(self.model.state_dict())
 
-    def _packing(self, by: str, kernel: str, state: bool) -> Dict[str, Any]:
+    def _packing(self, by: str, state: bool) -> Dict[str, Any]:
         '''
-        Pack Test Returned Data including `correct_class` and returned result of `sortingx.[method]()`.
+        Pack Test Returned Data including `correct_class` and returned result of `sorted`.
         :param by: str, choose which way to sort the order of 'correct_class'.
-        :param kernel: str, choose which kernel used for sorting `correct_class.items()`.
         :param state: bool, choose the state when `correct_class` is sorting.
         '''
-        assert kernel in sortingx.__all__, "Please ensure kernel is sortingx.__all__."
-        kernel = eval('sortingx.' + kernel)
         loss_, classify, regress = {
             'loss': {'train': self.train_loss.item(), 
                      'val': self.val_loss.item(),
@@ -287,13 +288,13 @@ class BaseModel:
         if self.num_classes >= 2:
             classify.update(loss_)
             if by == 'numbers':
-                classify.update({'sorted': kernel(self.correct_class.items(), lambda d: d[1][0], reverse=state)})
+                classify.update({'sorted': sorted(self.correct_class.items(), key=lambda d: d[1][0], reverse=state)})
                 return classify
             elif by == 'accuracy':
-                classify.update({'sorted': kernel(self.correct_class.items(), lambda d: d[1][0]/d[1][1], reverse=state)})
+                classify.update({'sorted': sorted(self.correct_class.items(), key=lambda d: d[1][0]/d[1][1], reverse=state)})
                 return classify
             elif by == 'num-total':
-                classify.update({'sorted': kernel(self.correct_class.items(), lambda d: (d[1][0], d[1][1]), reverse=state)})
+                classify.update({'sorted': sorted(self.correct_class.items(), key=lambda d: (d[1][0], d[1][1]), reverse=state)})
                 return classify
             else:
                 raise ValueError("`lambda` Caused with `by` Configuration Supports: numbers, accuracy, num-total.")
