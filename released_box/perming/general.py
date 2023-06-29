@@ -42,7 +42,6 @@ class Box(BaseModel):
                                   batch_size, 
                                   learning_rate_init, 
                                   lr_scheduler)
-        assert num_classes >= 1
 
     def _device(self, option: str) -> None:
         '''

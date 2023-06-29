@@ -23,7 +23,7 @@ GENERAL_BOX = Box
 COMMON_MODELS = {
     'Regression': Regressier,
     'Binary-classification': Binarier,
-    'Multi-classification': Mutipler
+    'Multi-classification': Mutipler,
 }
 
-__version__ = '1.2.0'
+__version__ = '1.2.1'

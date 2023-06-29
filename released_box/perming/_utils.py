@@ -161,12 +161,11 @@ class BaseModel:
         assert ratio_set['train'] > 4 * ratio_set['test'], "The training set needs to be larger than the test set."
         assert ratio_set['train'] + ratio_set['test'] + ratio_set['val'] == 10, "The sum of 3 datasets' ratio needs to be 10."
         assert isinstance(features, TabularData) and features.ndim == 2, 'Please ensure features with dimension at (n_samples, n_features).'
-        assert features.shape[1] > 1 and features.shape[1] == self.input, "Please ensure `input_` is equal to `features.shape[1]`."
+        assert features.shape[1] == self.input, "Please ensure `input_` is equal to `features.shape[1]`."
         assert isinstance(target, TabularData), "Please ensure target format at numpy.ndarray noted as TabularData."
         if isinstance(target[0], TabularData): # (n_samples, n_outputs)
             raise RuntimeError("data_loader not support target with (n_samples, n_ouputs) yet.")
         else: # (n_samples,)
-            assert len(target.shape) == 1 and target.shape[0] > 0, "Please ensure target is 1d scalar value."
             if self.num_classes >= 2:
                 self.unique = numpy.unique(target) # int indexes -> any class with single value noted
                 assert len(self.unique) == self.num_classes, "Please ensure `num_classes` is equal to `len(numpy.unique(labels))`."
@@ -195,6 +194,7 @@ class BaseModel:
         assert n_jobs == -1 or n_jobs > 0, 'Take full jobs with setting n_jobs=-1 or manually set nums of jobs.'
         total_step = len(self.train_loader)
         self._set_container(backend, n_jobs)
+        val_length = len(self.val_container)
         for epoch in range(num_epochs):
             gc.collect()
             torch.cuda.empty_cache()
@@ -218,7 +218,7 @@ class BaseModel:
                         outputs_val = self.model(val_set[0].to(self.device))
                         self.val_loss += self.criterion(outputs_val, val_set[1].to(self.device))
 
-                self.val_loss /= len(self.val_container)
+                self.val_loss /= val_length
 
                 # console print
                 if (i + 1) % interval == 0:
@@ -252,7 +252,7 @@ class BaseModel:
     
     def save(self, show: bool=True, dir: str='./model') -> None:
         '''
-        Save Model Checkpoint with Classifier and Regressier.
+        Save Model Checkpoint with Box, Regressier, Binarier, and Multipler.
         :param show: bool, whether to show `model.state_dict()`. default: True.
         :param dir: str, model save to dir. default: './model'.
         '''
@@ -262,7 +262,7 @@ class BaseModel:
 
     def load(self, show: bool=True, dir: str='./model') -> None:
         '''
-        Save Model Checkpoint with Classifier and Regressier.
+        Load Model Checkpoint with Box, Regressier, Binarier, and Multipler.
         :param show: bool, whether to show `model.state_dict()`. default: True.
         :param dir: str, model load from dir. default: './model'.
         '''

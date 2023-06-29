@@ -139,7 +139,7 @@ class Binarier(BaseModel):
         else:
             raise ValueError("Criterion Configuration Supports Options: BCELoss, BCEWithLogitsLoss.")
 
-class Mutipler:
+class Mutipler(BaseModel):
     '''
     Mutiple Supervised Learning Classifier for Tabular Data.
     :param input_: int, features' dimension of tabular data is input_.
@@ -175,7 +175,7 @@ class Mutipler:
                                        batch_size, 
                                        learning_rate_init, 
                                        lr_scheduler)
-        assert num_classes >= 2
+        assert num_classes >= 2, "The predefined options of Multipler are more suitable for Multi-classification problems."
 
     def _activate(self, activation: str):
         '''
