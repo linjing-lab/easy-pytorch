@@ -11,11 +11,11 @@ class TabularDataset(torch.utils.data.Dataset):
     Tabular Data Constructed with `numpy.array` noted as `TabularData`.
     :param features: TabularData, composed of n-row samples and m-column features.
     :param target: TabularData, consists of correct labels or values with size at n.
-    :param squeeze: bool, regression or classification. it represents a regression problem when `squeeze=True`.
+    :param roc: bool, regression or classification. it represents a regression problem when `roc=True`.
     '''
-    def __init__(self, features: TabularData, target: TabularData, squeeze: bool) -> None:
+    def __init__(self, features: TabularData, target: TabularData, roc: bool) -> None:
         self.features = torch.as_tensor(features, dtype=torch.float)
-        self.target = torch.as_tensor(target, dtype=torch.float) if squeeze else torch.as_tensor(target, dtype=torch.long)
+        self.target = torch.as_tensor(target, dtype=torch.float) if roc else torch.as_tensor(target, dtype=torch.long)
 
     def __getitem__(self, index):
         return self.features[index], self.target[index]
@@ -163,8 +163,13 @@ class BaseModel:
         assert isinstance(features, TabularData) and features.ndim == 2, 'Please ensure features with dimension at (n_samples, n_features).'
         assert features.shape[1] == self.input, "Please ensure `input_` is equal to `features.shape[1]`."
         assert isinstance(target, TabularData), "Please ensure target format at numpy.ndarray noted as TabularData."
-        if isinstance(target[0], TabularData): # (n_samples, n_outputs)
-            raise RuntimeError("data_loader not support target with (n_samples, n_ouputs) yet.")
+        target_dtype = str(target.dtype) # __str__
+        is_int_type, is_float_type = "int" in target_dtype, "float" in target_dtype
+        self.is_target_2d = isinstance(target[0], TabularData) # judge target is 2d matrix.
+        if self.is_target_2d: # (n_samples, n_outputs)
+            assert target.shape[1] == self.num_classes, "Please ensure target with (n_samples, n_outputs=num_classes)."
+            assert is_int_type or is_float_type, "Please ensure target.dtype in any int or float type of numpy.dtype."
+            roc = not is_int_type and is_float_type
         else: # (n_samples,)
             if self.num_classes >= 2:
                 self.unique = numpy.unique(target) # int indexes -> any class with single value noted
@@ -172,11 +177,12 @@ class BaseModel:
                 self.indices = dict(zip(self.unique, range(self.num_classes))) # original classes -> int indexes
                 target = numpy.array([self.indices[value] for value in target], dtype=numpy.int8) # adjust int8 -> any int dtype
             else:
-                assert str(target.dtype).startswith("float"), "Please ensure target.dtype in any float type of numpy.dtype"
+                assert is_float_type, "Please ensure target.dtype in any float type of numpy.dtype." # continuous
+            roc: bool = self.model.squeeze
         train_, test_, val_ = train_test_val_split(features, target, ratio_set, random_seed)
-        self.train_loader = torch.utils.data.DataLoader(TabularDataset(train_['features'], train_['target'], self.model.squeeze), batch_size=self.batch_size, shuffle=True, num_workers=worker_set['train'], )
-        self.test_loader = torch.utils.data.DataLoader(TabularDataset(test_['features'], test_['target'], self.model.squeeze), batch_size=self.batch_size, shuffle=True, num_workers=worker_set['test'])
-        self.val_loader = torch.utils.data.DataLoader(TabularDataset(val_['features'], val_['target'], self.model.squeeze), batch_size=self.batch_size, shuffle=False, num_workers=worker_set['val'])
+        self.train_loader = torch.utils.data.DataLoader(TabularDataset(train_['features'], train_['target'], roc), batch_size=self.batch_size, shuffle=True, num_workers=worker_set['train'], )
+        self.test_loader = torch.utils.data.DataLoader(TabularDataset(test_['features'], test_['target'], roc), batch_size=self.batch_size, shuffle=True, num_workers=worker_set['test'])
+        self.val_loader = torch.utils.data.DataLoader(TabularDataset(val_['features'], val_['target'], roc), batch_size=self.batch_size, shuffle=False, num_workers=worker_set['val'])
 
     def train_val(self, 
                   num_epochs: int=2, 
@@ -217,7 +223,6 @@ class BaseModel:
                     for val_set in self.val_container:
                         outputs_val = self.model(val_set[0].to(self.device))
                         self.val_loss += self.criterion(outputs_val, val_set[1].to(self.device))
-
                 self.val_loss /= val_length
 
                 # console print
@@ -233,13 +238,14 @@ class BaseModel:
         :param sort_state: bool, whether to use descending order when sorting. default: True.
         '''
         with torch.no_grad():
-            self.test_loss, correct, self.correct_class, test_loader_step = 0, 0, dict.fromkeys(self.unique, [0, 0]) if self.num_classes >= 2 else None, len(self.test_loader)
+            self.test_loss, test_loader_step, correct = 0, len(self.test_loader), 0
             test_total = test_loader_step * self.batch_size
+            self.correct_class = dict.fromkeys(self.unique, [0, 0]) if not self.is_target_2d and self.num_classes >= 2 else None
             for features, target in self.test_loader:
                 features = features.to(self.device)
                 target = target.to(self.device)            
                 outputs = self.model(features)
-                if self.num_classes >= 2:
+                if not self.is_target_2d and self.num_classes >= 2:
                     _, predicted = torch.max(outputs.data, 1)
                     for index, value in enumerate(predicted):
                         self.correct_class[self.unique[value]][1] += 1 # record total numbers of each class
@@ -252,7 +258,7 @@ class BaseModel:
     
     def save(self, show: bool=True, dir: str='./model') -> None:
         '''
-        Save Model Checkpoint with Box, Regressier, Binarier, and Multipler.
+        Save Model Checkpoint with Box, Regressier, Binarier, Multipler, and Ranker.
         :param show: bool, whether to show `model.state_dict()`. default: True.
         :param dir: str, model save to dir. default: './model'.
         '''
@@ -262,7 +268,7 @@ class BaseModel:
 
     def load(self, show: bool=True, dir: str='./model') -> None:
         '''
-        Load Model Checkpoint with Box, Regressier, Binarier, and Multipler.
+        Load Model Checkpoint with Box, Regressier, Binarier, Multipler, and Ranker.
         :param show: bool, whether to show `model.state_dict()`. default: True.
         :param dir: str, model load from dir. default: './model'.
         '''
@@ -277,15 +283,15 @@ class BaseModel:
         :param by: str, choose which way to sort the order of 'correct_class'.
         :param state: bool, choose the state when `correct_class` is sorting.
         '''
-        loss_, classify, regress = {
+        loss_, classify, regress, outputs = {
             'loss': {'train': self.train_loss.item(), 
                      'val': self.val_loss.item(),
                      'test': self.test_loss.item()}
         }, {'problem': 'classification',
             'num_classes': self.num_classes,
             'column': ('label name', ('true numbers', 'total numbers')),
-            'labels': self.correct_class}, {'problem': 'regression'}
-        if self.num_classes >= 2:
+            'labels': self.correct_class}, {'problem': 'regression'}, {'problem': 'multi-outputs'}
+        if not self.is_target_2d and self.num_classes >= 2:
             classify.update(loss_)
             if by == 'numbers':
                 classify.update({'sorted': sorted(self.correct_class.items(), key=lambda d: d[1][0], reverse=state)})
@@ -299,8 +305,12 @@ class BaseModel:
             else:
                 raise ValueError("`lambda` Caused with `by` Configuration Supports: numbers, accuracy, num-total.")
         else:
-            regress.update(loss_)
-            return regress
+            if self.is_target_2d:
+                outputs.update(loss_)
+                return outputs # Multi-outputs
+            else:
+                regress.update(loss_)
+                return regress
 
     def _set_container(self, backend: str, n_jobs: int) -> None:
         '''

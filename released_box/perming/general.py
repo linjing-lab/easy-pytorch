@@ -85,12 +85,14 @@ class Box(BaseModel):
     def _criterion(self, criterion: str):
         '''
         Configure Loss Criterion with `criterion`.
-        :param criterion: str, "CrossEntropyLoss", "NLLLoss", "BCELoss", "BCEWithLogitsLoss", "MultiLabelMarginLoss", "MSELoss", "L1Loss", "SmoothL1Loss", "KLDivLoss". default: CrossEntropyLoss.
+        :param criterion: str, "CrossEntropyLoss", "NLLLoss", "MultiLabelMarginLoss", "BCELoss", "BCEWithLogitsLoss", "MSELoss", "L1Loss", "SmoothL1Loss", "KLDivLoss". default: CrossEntropyLoss.
         '''
         if criterion == 'CrossEntropyLoss': # classification with num_classes > 2.
             return torch.nn.CrossEntropyLoss()
         elif criterion == 'NLLLoss':
             return torch.nn.NLLLoss()
+        elif criterion == 'MultiLabelSoftMarginLoss':
+            return torch.nn.MultiLabelSoftMarginLoss()
         elif criterion == 'BCELoss': # classification with num_classes = 2
             return torch.nn.BCELoss()
         elif criterion == 'BCEWithLogitsLoss':
@@ -104,4 +106,4 @@ class Box(BaseModel):
         elif criterion == 'KLDivLoss':
             return torch.nn.KLDivLoss()
         else:
-            raise ValueError("Criterion Configuration Supports Options: CrossEntropyLoss, NLLLoss, BCELoss, BCEWithLogitsLoss, MultiLabelMarginLoss, MSELoss, L1Loss, SmoothL1Loss, KLDivLoss.") 
+            raise ValueError("Criterion Configuration Supports Options: CrossEntropyLoss, NLLLoss, MultiLabelSoftMarginLoss, BCELoss, BCEWithLogitsLoss, MSELoss, L1Loss, SmoothL1Loss, KLDivLoss.") 

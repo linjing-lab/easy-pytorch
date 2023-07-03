@@ -16,7 +16,7 @@ except ModuleNotFoundError:
     pass
 
 from .general import Box
-from .common import Regressier, Binarier, Mutipler
+from .common import Regressier, Binarier, Mutipler, Ranker
 
 GENERAL_BOX = Box
 
@@ -24,6 +24,7 @@ COMMON_MODELS = {
     'Regression': Regressier,
     'Binary-classification': Binarier,
     'Multi-classification': Mutipler,
+    'Multi-outputs': Ranker
 }
 
-__version__ = '1.2.1'
+__version__ = '1.3.0'
