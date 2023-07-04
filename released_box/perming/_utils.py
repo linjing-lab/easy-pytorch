@@ -180,7 +180,7 @@ class BaseModel:
                 assert is_float_type, "Please ensure target.dtype in any float type of numpy.dtype." # continuous
             roc: bool = self.model.squeeze
         train_, test_, val_ = train_test_val_split(features, target, ratio_set, random_seed)
-        self.train_loader = torch.utils.data.DataLoader(TabularDataset(train_['features'], train_['target'], roc), batch_size=self.batch_size, shuffle=True, num_workers=worker_set['train'], )
+        self.train_loader = torch.utils.data.DataLoader(TabularDataset(train_['features'], train_['target'], roc), batch_size=self.batch_size, shuffle=True, num_workers=worker_set['train'])
         self.test_loader = torch.utils.data.DataLoader(TabularDataset(test_['features'], test_['target'], roc), batch_size=self.batch_size, shuffle=True, num_workers=worker_set['test'])
         self.val_loader = torch.utils.data.DataLoader(TabularDataset(val_['features'], val_['target'], roc), batch_size=self.batch_size, shuffle=False, num_workers=worker_set['val'])
 
