@@ -22,7 +22,7 @@ class Box(BaseModel):
                  input_: int, 
                  num_classes: int, # num_classes=1
                  hidden_layer_sizes: Tuple[int]=(100,),
-                 device: str="cuda",
+                 device: str='cuda',
                  *,
                  activation: str='relu', 
                  inplace_on: bool=False, 
@@ -46,19 +46,19 @@ class Box(BaseModel):
     def _device(self, option: str) -> None:
         '''
         Set Device for Model and Training.
-        :param option: device configuration. str, "cuda" or "cpu".
+        :param option: device configuration. str, 'cuda' or 'cpu'.
         '''
-        if option == "cuda":
-            return torch.device(option if torch.cuda.is_available() else "cpu")
-        elif option == "cpu":
+        if option == 'cuda':
+            return torch.device(option if torch.cuda.is_available() else 'cpu')
+        elif option == 'cpu':
             return torch.device(option)
         else:
-            raise ValueError('Box Only Support 2 Options for Device Configuration: "cuda" or "cpu".')
+            raise ValueError("Box Only Support 2 Options for Device Configuration: 'cuda' or 'cpu'.")
 
     def _activate(self, activation: str, inplace_on: bool):
         '''
         Configure Activation with `activation` and `inplace_on`.
-        :param activation: str, "relu", "tanh", "sigmoid", "rrelu", "leaky_relu", "prelu", "softplus", "elu", "celu".
+        :param activation: str, 'relu', 'tanh', 'sigmoid', 'rrelu', 'leaky_relu', 'prelu', 'softplus', 'elu', 'celu'.
         :param inplace_on: bool, whether to use `inplace=True` on activations. default: False.
         '''
         if activation == 'relu': # most use
@@ -85,7 +85,7 @@ class Box(BaseModel):
     def _criterion(self, criterion: str):
         '''
         Configure Loss Criterion with `criterion`.
-        :param criterion: str, "CrossEntropyLoss", "NLLLoss", "MultiLabelMarginLoss", "BCELoss", "BCEWithLogitsLoss", "MSELoss", "L1Loss", "SmoothL1Loss", "KLDivLoss". default: CrossEntropyLoss.
+        :param criterion: str, 'CrossEntropyLoss', 'NLLLoss', 'MultiLabelMarginLoss', 'BCELoss', 'BCEWithLogitsLoss', 'MSELoss', 'L1Loss', 'SmoothL1Loss', 'KLDivLoss'. default: CrossEntropyLoss.
         '''
         if criterion == 'CrossEntropyLoss': # classification with num_classes > 2.
             return torch.nn.CrossEntropyLoss()

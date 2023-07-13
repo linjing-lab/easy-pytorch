@@ -29,7 +29,7 @@ class Regressier(BaseModel):
         super(Regressier, self).__init__(input_, 
                                          1, 
                                          hidden_layer_sizes, 
-                                         torch.device("cuda" if torch.cuda.is_available() else "cpu"), 
+                                         torch.device('cuda' if torch.cuda.is_available() else 'cpu'), 
                                          self._activate(activation), 
                                          self._criterion(criterion), 
                                          solver, 
@@ -40,7 +40,7 @@ class Regressier(BaseModel):
     def _activate(self, activation: str):
         '''
         Configure Activation with `activation` and `inplace=True`.
-        :param activation: str, "relu", "rrelu", "leaky_relu", "elu", "celu". default: 'relu'.
+        :param activation: str, 'relu', 'rrelu', 'leaky_relu', 'elu', 'celu'. default: 'relu'.
         '''
         if activation == 'relu':
             return torch.nn.ReLU(inplace=True)
@@ -58,7 +58,7 @@ class Regressier(BaseModel):
     def _criterion(self, criterion: str):
         '''
         Configure Loss Criterion with `criterion`.
-        :param criterion: str, "MSELoss", "L1Loss", "SmoothL1Loss", "KLDivLoss". default: MSELoss.
+        :param criterion: str, 'MSELoss', 'L1Loss', 'SmoothL1Loss', 'KLDivLoss'. default: MSELoss.
         '''
         if criterion == 'MSELoss':
             return torch.nn.MSELoss()
@@ -97,7 +97,7 @@ class Binarier(BaseModel):
         super(Binarier, self).__init__(input_, 
                                        2, 
                                        hidden_layer_sizes, 
-                                       torch.device("cuda" if torch.cuda.is_available() else "cpu"), 
+                                       torch.device('cuda' if torch.cuda.is_available() else 'cpu'), 
                                        self._activate(activation), 
                                        self._criterion(criterion), 
                                        solver, 
@@ -108,7 +108,7 @@ class Binarier(BaseModel):
     def _activate(self, activation: str):
         '''
         Configure Activation with `activation` and `inplace=True`.
-        :param activation: str, "relu", "tanh", "sigmoid", "rrelu", "leaky_relu", "elu", "celu".
+        :param activation: str, 'relu', 'tanh', 'sigmoid', 'rrelu', 'leaky_relu', 'elu', 'celu'.
         '''
         if activation == 'relu':
             return torch.nn.ReLU(inplace=True)
@@ -130,7 +130,7 @@ class Binarier(BaseModel):
     def _criterion(self, criterion: str):
         '''
         Configure Loss Criterion with `criterion`.
-        :param criterion: str, "BCELoss", "BCEWithLogitsLoss". default: BCELoss.
+        :param criterion: str, 'BCELoss', 'BCEWithLogitsLoss'. default: BCELoss.
         '''
         if criterion == 'BCELoss':
             return torch.nn.BCELoss()
@@ -168,7 +168,7 @@ class Mutipler(BaseModel):
         super(Mutipler, self).__init__(input_, 
                                        num_classes, 
                                        hidden_layer_sizes, 
-                                       torch.device("cuda" if torch.cuda.is_available() else "cpu"), 
+                                       torch.device('cuda' if torch.cuda.is_available() else 'cpu'), 
                                        self._activate(activation), 
                                        self._criterion(criterion), 
                                        solver, 
@@ -180,7 +180,7 @@ class Mutipler(BaseModel):
     def _activate(self, activation: str):
         '''
         Configure Activation with `activation` and `inplace=True`.
-        :param activation: str, "relu", "rrelu", "leaky_relu", "elu", "celu".
+        :param activation: str, 'relu', 'rrelu', 'leaky_relu', 'elu', 'celu'.
         '''
         if activation == 'relu':
             return torch.nn.ReLU(inplace=True)
@@ -198,7 +198,7 @@ class Mutipler(BaseModel):
     def _criterion(self, criterion: str):
         '''
         Configure Loss Criterion with `criterion`.
-        :param criterion: str, "CrossEntropyLoss", "NLLLoss".
+        :param criterion: str, 'CrossEntropyLoss', 'NLLLoss'.
         '''
         if criterion == 'CrossEntropyLoss':
             return torch.nn.CrossEntropyLoss()
@@ -236,7 +236,7 @@ class Ranker(BaseModel):
         super(Ranker, self).__init__(input_, 
                                      num_outputs, 
                                      hidden_layer_sizes, 
-                                     torch.device("cuda" if torch.cuda.is_available() else "cpu"), 
+                                     torch.device('cuda' if torch.cuda.is_available() else 'cpu'), 
                                      self._activate(activation), 
                                      self._criterion(criterion),
                                      solver, 
@@ -265,13 +265,13 @@ class Ranker(BaseModel):
     def _criterion(self, criterion: str):
         '''
         Configure Loss Criterion with `criterion`.
-        :param criterion: str, "MultiLabelMarginLoss", "BCEWithLogitsLoss", "MSELoss". default: MultiLabelMarginLoss
+        :param criterion: str, 'MultiLabelMarginLoss', 'BCEWithLogitsLoss', 'MSELoss'. default: MultiLabelMarginLoss
         '''
-        if criterion == 'MultiLabelSoftMarginLoss': # np.array([[0, 1], [1, 1]])
+        if criterion == 'MultiLabelSoftMarginLoss': # torch.long
             return torch.nn.MultiLabelSoftMarginLoss()
-        elif criterion == 'BCEWithLogitsLoss': # np.array([[0.0, 1.0], [1.0, 1.0]])
+        elif criterion == 'BCEWithLogitsLoss': # torch.float
             return torch.nn.BCEWithLogitsLoss()
-        elif criterion == 'MSELoss': # np.array([[1.5, 2.0],[3.0, 1.6]])
+        elif criterion == 'MSELoss': # torch.float
             return torch.nn.MSELoss()
         else:
             raise ValueError("Criterion Configuration Supports Options: MultiLabelSoftMarginLoss, BCEWithLogitsLoss, MSELoss.")

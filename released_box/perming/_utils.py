@@ -34,17 +34,18 @@ class MLP(torch.nn.Module):
     def __init__(self, input_: int, num_classes: int, hidden_layer_sizes: Tuple[int], activation) -> None:
         super(MLP, self).__init__()
         self.squeeze: bool = False if num_classes > 1 else True
-        if hidden_layer_sizes:
+        if hidden_layer_sizes: # for linear indivisible datasets
             assert hidden_layer_sizes[0] > 0, "Please ensure any layer of hidden_layer_sizes > 0"
             model_layers, hidden_length = OrderedDict(), len(hidden_layer_sizes)
             model_layers['Linear0'] = torch.nn.Linear(input_, hidden_layer_sizes[0])
             model_layers['Activation0'] = activation
             for index in range(1, hidden_length):
                 assert hidden_layer_sizes[index] > 0, "Please ensure any layer of hidden_layer_sizes > 0"
-                linear_, activation_ = "Linear" + str(index), "Activation" + str(index)
+                ind_str = str(index)
+                linear_, activation_ = 'Linear'.join(('', ind_str)), 'Activation'.join(('', ind_str))
                 model_layers[linear_] = torch.nn.Linear(hidden_layer_sizes[index - 1], hidden_layer_sizes[index])
                 model_layers[activation_] = activation
-            model_layers["Linear" + str(hidden_length)] = torch.nn.Linear(hidden_layer_sizes[hidden_length - 1], num_classes)
+            model_layers['Linear'.join(('', str(hidden_length)))] = torch.nn.Linear(hidden_layer_sizes[hidden_length - 1], num_classes)
             self.mlp = torch.nn.Sequential(model_layers)
         else:
             self.mlp = torch.nn.Linear(input_, num_classes)
@@ -85,9 +86,9 @@ class BaseModel:
         assert learning_rate_init > 0 and learning_rate_init < 1.0, 'Please assert learning rate initialized value in (0, 1.0).'
         self.input: int = input_
         self.num_classes: int = num_classes
-        self.activation = activation
+        self.activation = activation # function activate high-dimensional features
         self.device = device # device configuration
-        self.criterion = criterion
+        self.criterion = criterion # criterion with classification & torch.long, regression & torch.float, and multi-outputs & roc
         self.batch_size: int = batch_size
         self.lr: float = learning_rate_init
         self.model = MLP(self.input, self.num_classes, hidden_layer_sizes, self.activation).to(self.device)
@@ -99,7 +100,7 @@ class BaseModel:
     def _solver(self, solver: str):
         '''
         Configure Optimizer with `solver`.
-        :param solver: str, "sgd", "momentum", "adam", "adagrad", "rmsprop". default: adam.
+        :param solver: str, 'sgd', 'momentum', 'adam', 'adagrad', 'rmsprop'. default: adam.
         '''
         if solver == 'sgd':
             return torch.optim.SGD(self.model.parameters(), lr=self.lr)
@@ -117,7 +118,7 @@ class BaseModel:
     def _scheduler(self, lr_scheduler: Optional[str]):
         '''
         Configure Learning Rate Scheduler with `lr_scheduler`.
-        :param lr_scheduler: str, "exponential_lr", "step_lr", "cosine_annealing_lr". default: None.
+        :param lr_scheduler: str, 'exponential_lr', 'step_lr', 'cosine_annealing_lr'. default: None.
         '''
         if lr_scheduler != None:
             if lr_scheduler == 'exponential_lr':
@@ -142,7 +143,7 @@ class BaseModel:
             'lr_scheduler': self.lr_scheduler,
             'device': self.device,
         })
-    
+
     def data_loader(self, 
                     features: TabularData, 
                     target: TabularData, 
@@ -169,7 +170,7 @@ class BaseModel:
         if self.is_target_2d: # (n_samples, n_outputs)
             assert target.shape[1] == self.num_classes, "Please ensure target with (n_samples, n_outputs=num_classes)."
             assert is_int_type or is_float_type, "Please ensure target.dtype in any int or float type of numpy.dtype."
-            roc = not is_int_type and is_float_type
+            roc: bool = not is_int_type and is_float_type
         else: # (n_samples,)
             if self.num_classes >= 2:
                 self.unique = numpy.unique(target) # int indexes -> any class with single value noted
@@ -218,10 +219,10 @@ class BaseModel:
                 _ = self.solver.step() if self.lr_scheduler == None else self.lr_scheduler.step()
 
                 # validation with val_container
-                self.val_loss = 0
+                self.val_loss = 0 # int value at cpu
                 with parallel_backend(backend, n_jobs=n_jobs):
                     for val_set in self.val_container:
-                        outputs_val = self.model(val_set[0].to(self.device))
+                        outputs_val = self.model(val_set[0].to(self.device)) # return value from cuda
                         self.val_loss += self.criterion(outputs_val, val_set[1].to(self.device))
                 self.val_loss /= val_length
 
@@ -233,7 +234,8 @@ class BaseModel:
              sort_by: str='accuracy',
              sort_state: bool=True):
         '''
-        Test with Initialized Configuration. `accuracy > 0`, 'correct_class != None' and keywords only appears when `num_classes >= 2`.
+        Test with Initialized Configuration. `accuracy > 0`, 'correct_class != None'
+        Configured keywords only work when `not self.is_target_2d and num_classes >= 2`.
         :param sort_by: str, 'accuracy', 'numbers', 'num-total'. default: 'accuracy'.
         :param sort_state: bool, whether to use descending order when sorting. default: True.
         '''
@@ -254,8 +256,8 @@ class BaseModel:
                 self.test_loss += self.criterion(outputs, target)
             self.test_loss /= test_loader_step
             print('loss of {0} on the {1} test dataset: {2}. accuracy: {3:.4f} %'.format(self.__class__.__name__, test_total, self.test_loss.item(), 100 * correct / test_total))
-        return OrderedDict(self._packing(sort_by, sort_state))
-    
+        return OrderedDict(self._pack_info(sort_by, sort_state))
+
     def save(self, show: bool=True, dir: str='./model') -> None:
         '''
         Save Model Checkpoint with Box, Regressier, Binarier, Multipler, and Ranker.
@@ -277,7 +279,7 @@ class BaseModel:
         if show:
             print(self.model.state_dict())
 
-    def _packing(self, by: str, state: bool) -> Dict[str, Any]:
+    def _pack_info(self, by: str, state: bool) -> Dict[str, Any]:
         '''
         Pack Test Returned Data including `correct_class` and returned result of `sorted`.
         :param by: str, choose which way to sort the order of 'correct_class'.

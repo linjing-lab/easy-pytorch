@@ -58,8 +58,8 @@ setup(
         'Topic :: Scientific/Engineering :: Artificial Intelligence',
     ],
     install_requires=[
-        "numpy>=1.21.0",
-        "joblib>=1.1.0"
+        'numpy>=1.21.0',
+        'joblib>=1.1.0'
     ]
     # extras_require=[]
 )
