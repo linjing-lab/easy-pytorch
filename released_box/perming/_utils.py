@@ -159,26 +159,26 @@ class BaseModel:
         :param random_seed: int | None, random.seed(random_seed) used for fixed random datasets. default: None.
         '''
         assert ratio_set['train'] > 0 and ratio_set['test'] > 0 and ratio_set['val'] > 0
-        assert ratio_set['train'] > 4 * ratio_set['test'], "The training set needs to be larger than the test set."
-        assert ratio_set['train'] + ratio_set['test'] + ratio_set['val'] == 10, "The sum of 3 datasets' ratio needs to be 10."
+        assert ratio_set['train'] > 4 * ratio_set['test'], 'The training set needs to be larger than the test set.'
+        assert ratio_set['train'] + ratio_set['test'] + ratio_set['val'] == 10, 'The sum of 3 datasets ratio needs to be 10.'
         assert isinstance(features, TabularData) and features.ndim == 2, 'Please ensure features with dimension at (n_samples, n_features).'
-        assert features.shape[1] == self.input, "Please ensure `input_` is equal to `features.shape[1]`."
-        assert isinstance(target, TabularData), "Please ensure target format at numpy.ndarray noted as TabularData."
+        assert features.shape[1] == self.input, 'Please ensure `input_` is equal to `features.shape[1]`.'
+        assert isinstance(target, TabularData), 'Please ensure target format at numpy.ndarray noted as TabularData.'
         target_dtype = str(target.dtype) # __str__
-        is_int_type, is_float_type = "int" in target_dtype, "float" in target_dtype
+        is_int_type, is_float_type = 'int' in target_dtype, 'float' in target_dtype
         self.is_target_2d = isinstance(target[0], TabularData) # judge target is 2d matrix.
         if self.is_target_2d: # (n_samples, n_outputs)
-            assert target.shape[1] == self.num_classes, "Please ensure target with (n_samples, n_outputs=num_classes)."
-            assert is_int_type or is_float_type, "Please ensure target.dtype in any int or float type of numpy.dtype."
+            assert target.shape[1] == self.num_classes, 'Please ensure target with (n_samples, n_outputs=num_classes).'
+            assert is_int_type or is_float_type, 'Please ensure target.dtype in any int or float type of numpy.dtype.'
             roc: bool = not is_int_type and is_float_type
         else: # (n_samples,)
             if self.num_classes >= 2:
                 self.unique = numpy.unique(target) # int indexes -> any class with single value noted
-                assert len(self.unique) == self.num_classes, "Please ensure `num_classes` is equal to `len(numpy.unique(labels))`."
+                assert len(self.unique) == self.num_classes, 'Please ensure `num_classes` is equal to `len(numpy.unique(labels))`.'
                 self.indices = dict(zip(self.unique, range(self.num_classes))) # original classes -> int indexes
                 target = numpy.array([self.indices[value] for value in target], dtype=numpy.int8) # adjust int8 -> any int dtype
             else:
-                assert is_float_type, "Please ensure target.dtype in any float type of numpy.dtype." # continuous
+                assert is_float_type, 'Please ensure target.dtype in any float type of numpy.dtype.' # continuous
             roc: bool = self.model.squeeze
         train_, test_, val_ = train_test_val_split(features, target, ratio_set, random_seed)
         self.train_loader = torch.utils.data.DataLoader(TabularDataset(train_['features'], train_['target'], roc), batch_size=self.batch_size, shuffle=True, num_workers=worker_set['train'])
@@ -186,22 +186,31 @@ class BaseModel:
         self.val_loader = torch.utils.data.DataLoader(TabularDataset(val_['features'], val_['target'], roc), batch_size=self.batch_size, shuffle=False, num_workers=worker_set['val'])
 
     def train_val(self, 
-                  num_epochs: int=2, 
-                  interval: int=100, 
-                  backend: str="threading", 
-                  n_jobs: int=-1) -> None:
+                  num_epochs: int=2,
+                  interval: int=100,
+                  tolerance: float=1e-3,
+                  patience: int=10, 
+                  backend: str='threading', 
+                  n_jobs: int=-1,
+                  early_stop: bool=False) -> None:
         '''
         Training and Validation with `train_loader` and `val_container`.
         :param num_epochs: int, training epochs for `self.model`. default: 2.
         :param interval: int, console output interval. default: 100.
-        :param backend: str, "threading", "multiprocessing, "locky". default: "threading".
+        :param tolerance: float, tolerance set to judge difference in val_loss. default: 1e-3
+        :param patience: int, patience of no improvement waiting for training to stop. default: 10.
+        :param backend: str, 'threading', 'multiprocessing', 'locky'. default: 'threading'.
         :param n_jobs: int, accelerate processing of validation. default: -1.
+        :param early_stop: bool, whether to enable early_stop in train_val. default: False
         '''
         assert num_epochs > 0 and interval > 0, 'With num_epochs > 0 and interval > 0 to train parameters into outputs.'
+        assert tolerance > 1e-9 and tolerance < 1.0, 'Set tolerance to early stop training and validation process within patience.'
+        assert patience >= 10 and patience <= 100, 'Value coordinate with tolerance should fit about num_epochs and batch_size.' 
         assert n_jobs == -1 or n_jobs > 0, 'Take full jobs with setting n_jobs=-1 or manually set nums of jobs.'
         total_step = len(self.train_loader)
         self._set_container(backend, n_jobs)
         val_length = len(self.val_container)
+        self.stop_iter: bool = False # init state of train_val
         for epoch in range(num_epochs):
             gc.collect()
             torch.cuda.empty_cache()
@@ -225,10 +234,29 @@ class BaseModel:
                         outputs_val = self.model(val_set[0].to(self.device)) # return value from cuda
                         self.val_loss += self.criterion(outputs_val, val_set[1].to(self.device))
                 self.val_loss /= val_length
+                val_counts = i + 1 + total_step * epoch
 
+                # early stop
+                if early_stop:
+                    bool_val_first: bool = i == 0 and epoch == 0
+                    if bool_val_first: # record first time of val_loss
+                        val_loss_pre = self.val_loss
+                    else:
+                        if val_loss_pre < self.val_loss:
+                            val_loss_pre = self.val_loss
+                        else:
+                            if val_counts % patience == 0:
+                                if val_loss_pre - self.val_loss < tolerance:
+                                    self.stop_iter: bool = True
+                                else:
+                                    val_loss_pre = self.val_loss
                 # console print
                 if (i + 1) % interval == 0:
-                    print ('Epoch [{}/{}], Step [{}/{}], Training Loss: {:.4f}, Validation Loss: {:.4f}'.format(epoch+1, num_epochs, i+1, total_step, self.train_loss.item(), self.val_loss.item()))
+                    print('Epoch [{}/{}], Step [{}/{}], Training Loss: {:.4f}, Validation Loss: {:.4f}'.format(epoch+1, num_epochs, i+1, total_step, self.train_loss.item(), self.val_loss.item()))
+
+            if self.stop_iter:
+                print('Process stop at epoch [{}/{}] with patience {} within tolerance {}'.format(epoch+1, num_epochs, patience, tolerance))
+                break
 
     def test(self, 
              sort_by: str='accuracy',
