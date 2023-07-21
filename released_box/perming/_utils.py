@@ -238,18 +238,20 @@ class BaseModel:
 
                 # early stop
                 if early_stop:
-                    bool_val_first: bool = i == 0 and epoch == 0
-                    if bool_val_first: # record first time of val_loss
+                    if val_counts == 1: # record first time of val_loss
                         val_loss_pre = self.val_loss
+                        val_pos_ini = 1
                     else:
                         if val_loss_pre < self.val_loss:
                             val_loss_pre = self.val_loss
+                            val_pos_ini = val_counts # renew val_pos_ini to record the postion of previous lowest loss
                         else:
-                            if val_counts % patience == 0:
+                            if (val_counts - val_pos_ini + 1) == patience:
                                 if val_loss_pre - self.val_loss < tolerance:
                                     self.stop_iter: bool = True
                                 else:
                                     val_loss_pre = self.val_loss
+                                    val_pos_ini = val_counts
                 # console print
                 if (i + 1) % interval == 0:
                     print('Epoch [{}/{}], Step [{}/{}], Training Loss: {:.4f}, Validation Loss: {:.4f}'.format(epoch+1, num_epochs, i+1, total_step, self.train_loss.item(), self.val_loss.item()))
