@@ -75,7 +75,7 @@ test with: PyTorch 1.7.1+cu101
 |save|show: bool=True<br />dir: str='./model'|Save Trained Model Parameters with Model `state_dict` Control by `show`.|
 |load|show: bool=True<br />dir: str='./model'|Load Trained Model Parameters with Model `state_dict` Control by `show`.|
 
-> prefer replace shape *(n,1)* with shape *(n,)* using `numpy.squeeze(input_matrix)`
+> prefer replace target shape *(n,1)* with shape *(n,)* using `numpy.squeeze(input_matrix)`
 
 ## pip install
 
