@@ -66,7 +66,7 @@ class BaseModel:
     :param solver: str, optimization coordinated with `torch.optim.lr_scheduler`. (modified more params in `_solver`.)
     :param batch_size: int, batch size of tabular dataset in one training process.
     :param learning_rate_init: float, initialize the learning rate of the optimizer.
-    :param lr_scheduler: str | None, set the learning rate scheduler integrated with the optimizer. default: None. (modifier more params in `_scheduler`.)
+    :param lr_scheduler: str | None, set the learning rate scheduler integrated with the optimizer. default: None. (modified more params in `_scheduler`.)
     '''
     def __init__(self,
                  input_: int,
@@ -239,19 +239,17 @@ class BaseModel:
                 # early stop
                 if early_stop:
                     if val_counts == 1: # record first time of val_loss
-                        val_loss_pre = self.val_loss
-                        val_pos_ini = 1
+                        val_loss_pre, val_pos_ini = self.val_loss, 1
                     else:
                         if val_loss_pre < self.val_loss:
-                            val_loss_pre = self.val_loss
-                            val_pos_ini = val_counts # renew val_pos_ini to record the postion of previous lowest loss
+                            val_loss_pre, val_pos_ini = self.val_loss, val_counts
                         else:
                             if (val_counts - val_pos_ini + 1) == patience:
                                 if val_loss_pre - self.val_loss < tolerance:
                                     self.stop_iter: bool = True
+                                    break
                                 else:
-                                    val_loss_pre = self.val_loss
-                                    val_pos_ini = val_counts
+                                    val_loss_pre, val_pos_ini = self.val_loss, val_counts
                 # console print
                 if (i + 1) % interval == 0:
                     print('Epoch [{}/{}], Step [{}/{}], Training Loss: {:.4f}, Validation Loss: {:.4f}'.format(epoch+1, num_epochs, i+1, total_step, self.train_loss.item(), self.val_loss.item()))
