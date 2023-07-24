@@ -28,8 +28,8 @@ class MLP(torch.nn.Module):
     Construct Model Layers with `input_`, `num_classes`, `hidden_layer_sizes`, `activation`.
     :param input_: int, features' dimension of tabular data is input_.
     :param num_classes: int, total number of correct label categories.
-    :param hidden_layer_sizes: Tuple[int], configure the size of each hidden layer. default: (100,).
-    :param activation:, activation configured by Classfier. default: torch.nn.ReLU().
+    :param hidden_layer_sizes: Tuple[int], configure the size of each hidden layer.
+    :param activation:, activation configured by Classfier.
     '''
     def __init__(self, input_: int, num_classes: int, hidden_layer_sizes: Tuple[int], activation) -> None:
         super(MLP, self).__init__()
