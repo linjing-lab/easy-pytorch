@@ -6,12 +6,12 @@ from ._utils import BaseModel, torch
 class Regressier(BaseModel):
     '''
     Supervised Learning Regressier for Tabular Data.
-    :param input_: int, features' dimension of tabular data is input_.
+    :param input_: int, input dataset with features' dimension of tabular data is input_.
     :param hidden_layer_sizes: Tuple[int], configure the size of each hidden layer. default: (100,).
     :param activation: str, configure function that activates the hidden layer. default: relu.
     :param criterion: str, loss function determined by different learning problem. default: MSELoss.
     :param solver: str, optimization function initialized with `learning_rate_init`. default: adam.
-    :param batch_size: int, batch size of dataset in one training process. default: 32.
+    :param batch_size: int, batch size of dataset in one training and validation process. default: 32.
     :param learning_rate_init: float, initialize the learning rate of the optimizer. default: 1e-2.
     :param lr_scheduler: str | None, set the learning rate scheduler integrated with the optimizer. default: None.
     '''
@@ -74,12 +74,12 @@ class Regressier(BaseModel):
 class Binarier(BaseModel):
     '''
     Binary Supervised Learning Classifier for Tabular Data.
-    :param input_: int, features' dimension of tabular data is input_.
+    :param input_: int, input dataset with features' dimension of tabular data is input_.
     :param hidden_layer_sizes: Tuple[int], configure the size of each hidden layer. default: (100,).
     :param activation: str, configure function that activates the hidden layer. default: relu.
     :param criterion: str, loss function determined by different learning problem. default: BCELoss.
     :param solver: str, optimization function coordinated with `torch.optim.lr_scheduler`. default: adam.
-    :param batch_size: int, batch size of dataset in one training process. default: 32.
+    :param batch_size: int, batch size of dataset in one training and validation process. default: 32.
     :param learning_rate_init: float, initialize the learning rate of the optimizer. default: 1e-2.
     :param lr_scheduler: str | None, set the learning rate scheduler integrated with the optimizer. default: None.
     '''
@@ -107,7 +107,7 @@ class Binarier(BaseModel):
 
     def _activate(self, activation: str):
         '''
-        Configure Activation with `activation` and `inplace=True`.
+        Configure Activation with `activation` and partly `inplace=True`.
         :param activation: str, 'relu', 'tanh', 'sigmoid', 'rrelu', 'leaky_relu', 'elu', 'celu'.
         '''
         if activation == 'relu':
@@ -142,14 +142,13 @@ class Binarier(BaseModel):
 class Mutipler(BaseModel):
     '''
     Mutiple Supervised Learning Classifier for Tabular Data.
-    :param input_: int, features' dimension of tabular data is input_.
+    :param input_: int, input dataset with features' dimension of tabular data is input_.
     :param num_classes: int, total number of correct label categories.
     :param hidden_layer_sizes: Tuple[int], configure the size of each hidden layer. default: (100,).
     :param activation: str, configure function that activates the hidden layer. default: relu.
-    :param inplace_on: bool, whether to use `inplace=True` on activation. default: False.
     :param criterion: str, loss function determined by different learning problem. default: CrossEntropyLoss.
     :param solver: str, optimization function coordinated with `torch.optim.lr_scheduler`. default: adam.
-    :param batch_size: int, batch size of dataset in one training process. default: 32.
+    :param batch_size: int, batch size of dataset in one training and validation process. default: 32.
     :param learning_rate_init: float, initialize the learning rate of the optimizer. default: 1e-2.
     :param lr_scheduler: str | None, set the learning rate scheduler integrated with the optimizer. default: None.
     '''
@@ -210,14 +209,13 @@ class Mutipler(BaseModel):
 class Ranker(BaseModel):
     '''
     Supervised Learning Outputs Ranker for Tabular Data.
-    :param input_: int, features' dimension of tabular data is input_.
+    :param input_: int, input dataset with features' dimension of tabular data is input_.
     :param num_outputs: int, total number of correct label outputs.
     :param hidden_layer_sizes: Tuple[int], configure the size of each hidden layer. default: (100,).
     :param activation: str, configure function that activates the hidden layer. default: relu.
-    :param inplace_on: bool, whether to use `inplace=True` on activation. default: False.
     :param criterion: str, loss function determined by different learning problem. default: MultiLabelSoftMarginLoss.
     :param solver: str, optimization function coordinated with `torch.optim.lr_scheduler`. default: adam.
-    :param batch_size: int, batch size of dataset in one training process. default: 32.
+    :param batch_size: int, batch size of dataset in one training and validation process. default: 32.
     :param learning_rate_init: float, initialize the learning rate of the optimizer. default: 1e-2.
     :param lr_scheduler: str | None, set the learning rate scheduler integrated with the optimizer. default: None.
     '''
@@ -247,7 +245,7 @@ class Ranker(BaseModel):
     def _activate(self, activation: str):
         '''
         Configure Activation with `activation` and `inplace=True`.
-        :param activation: str, "relu", "rrelu", "leaky_relu", "elu", "celu".
+        :param activation: str, 'relu', 'rrelu', 'leaky_relu', 'elu', 'celu'.
         '''
         if activation == 'relu':
             return torch.nn.ReLU(inplace=True)

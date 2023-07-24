@@ -10,8 +10,8 @@ class TabularDataset(torch.utils.data.Dataset):
     '''
     Tabular Data Constructed with `numpy.array` noted as `TabularData`.
     :param features: TabularData, composed of n-row samples and m-column features.
-    :param target: TabularData, consists of correct labels or values with size at n.
-    :param roc: bool, regression or classification. it represents a regression problem when `roc=True`.
+    :param target: TabularData, consists of correct labels or outputs with size at n.
+    :param roc: bool, as_tensor to torch.float or torch.long. select torch.float when `roc=True`.
     '''
     def __init__(self, features: TabularData, target: TabularData, roc: bool) -> None:
         self.features = torch.as_tensor(features, dtype=torch.float)
@@ -26,10 +26,10 @@ class TabularDataset(torch.utils.data.Dataset):
 class MLP(torch.nn.Module):
     '''
     Construct Model Layers with `input_`, `num_classes`, `hidden_layer_sizes`, `activation`.
-    :param input_: int, features' dimension of tabular data is input_.
-    :param num_classes: int, total number of correct label categories.
-    :param hidden_layer_sizes: Tuple[int], configure the size of each hidden layer.
-    :param activation:, activation configured by Classfier.
+    :param input_: int, input dataset with features' dimension of tabular data is input_.
+    :param num_classes: int, total number of correct label categories or multi-outputs.
+    :param hidden_layer_sizes: Tuple[int], configure the length and size of each hidden layer.
+    :param activation:, activation configured by Box, Regressier, Binarier, Multipler, and Ranker.
     '''
     def __init__(self, input_: int, num_classes: int, hidden_layer_sizes: Tuple[int], activation) -> None:
         super(MLP, self).__init__()
@@ -57,8 +57,8 @@ class MLP(torch.nn.Module):
 class BaseModel:
     '''
     Basic Model for Configuring Common Models and General Box.
-    :param input_: int, features' dimension of tabular data is input_.
-    :param num_classes: int, total number of correct label categories.
+    :param input_: int, input dataset with features' dimension of tabular data is input_.
+    :param num_classes: int, total number of correct label categories or multi-outputs.
     :param hidden_layer_sizes: Tuple[int], configure the size of each hidden layer.
     :param device: Any, device configured by common models and general box.
     :param activation: Any, activated function configured by common models and general box.
@@ -79,11 +79,10 @@ class BaseModel:
                  batch_size: int, 
                  learning_rate_init: float,
                  lr_scheduler: Optional[str]=None) -> None:
-
         assert input_ > 0, 'BaseModel need samples with dataset features named input_ > 0.'
         assert num_classes > 0, 'Supervised learning problems with num_classes ranges from (1, 2, 3, ...).'
         assert batch_size > 0, 'Batch size initialized with int value mostly 2^n(n=1, 2, 3), like 64, 128, 256.'
-        assert learning_rate_init > 0 and learning_rate_init < 1.0, 'Please assert learning rate initialized value in (0, 1.0).'
+        assert learning_rate_init > 1e-6 and learning_rate_init < 1.0, 'Please assert learning rate initialized value in (1e-6, 1.0).'
         self.input: int = input_
         self.num_classes: int = num_classes
         self.activation = activation # function activate high-dimensional features
@@ -92,7 +91,7 @@ class BaseModel:
         self.batch_size: int = batch_size
         self.lr: float = learning_rate_init
         self.model = MLP(self.input, self.num_classes, hidden_layer_sizes, self.activation).to(self.device)
-        if parse_torch_version(torch.__version__)[0] >= ['2', '0', '0']:
+        if parse_torch_version(torch.__version__)[0] >= ['2', '0', '0']: # compile model
             self.model = torch.compile(self.model)
         self.solver = self._solver(solver)
         self.lr_scheduler = self._scheduler(lr_scheduler)
@@ -155,7 +154,7 @@ class BaseModel:
         :param features: TabularData, composed of n-row samples and m-column features: (n_samples, n_features).
         :param target: TabularData, consists of correct labels or values: (n_samples,) or (n_samples, n_outputs).
         :param ratio_set: Dict[str, int], stores the proportion of train-set, test-set and val-set. default: {'train': 8, 'test': 1, 'val': 1}.
-        :param worker_set: Dict[str, int], load the configuration of DataLoader with multi-threaded. default: {'train': 8, 'test': 2, 'val': 1}.
+        :param worker_set: Dict[str, int], load the num_workers of DataLoader with multi-threaded. default: {'train': 8, 'test': 2, 'val': 1}.
         :param random_seed: int | None, random.seed(random_seed) used for fixed random datasets. default: None.
         '''
         assert ratio_set['train'] > 0 and ratio_set['test'] > 0 and ratio_set['val'] > 0
@@ -209,7 +208,7 @@ class BaseModel:
         assert n_jobs == -1 or n_jobs > 0, 'Take full jobs with setting n_jobs=-1 or manually set nums of jobs.'
         total_step = len(self.train_loader)
         self._set_container(backend, n_jobs)
-        val_length = len(self.val_container)
+        val_length: int = len(self.val_container)
         self.stop_iter: bool = False # init state of train_val
         for epoch in range(num_epochs):
             gc.collect()
@@ -234,7 +233,7 @@ class BaseModel:
                         outputs_val = self.model(val_set[0].to(self.device)) # return value from cuda
                         self.val_loss += self.criterion(outputs_val, val_set[1].to(self.device))
                 self.val_loss /= val_length
-                val_counts = i + 1 + total_step * epoch
+                val_counts = i + 1 + total_step * epoch # times of val_loss renewed
 
                 # early stop
                 if early_stop:
@@ -344,7 +343,7 @@ class BaseModel:
 
     def _set_container(self, backend: str, n_jobs: int) -> None:
         '''
-        Acquire Validation Container with `parallel_backend` at `n_jobs`.
+        Validation Container with `parallel_backend` at `n_jobs`.
         :param backend: str, "threading", "multiprocessing, 'locky'.
         :param n_jobs: int, set jobs with backend to accelerate process.
         '''

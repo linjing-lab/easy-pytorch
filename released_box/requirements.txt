@@ -1,4 +1,4 @@
-torch==1.7.1+cu101
 joblib>=1.1.0
-numpy>=1.21.0
+numpy>=1.24.0
 setuptools>=63.4.1
+torch==1.7.1+cu101
