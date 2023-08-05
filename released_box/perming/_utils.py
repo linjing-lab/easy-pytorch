@@ -323,7 +323,7 @@ class BaseModel:
             'num_classes': self.num_classes,
             'column': ('label name', ('true numbers', 'total numbers')),
             'labels': self.correct_class}, {'problem': 'regression'}, {'problem': 'multi-outputs'}
-        if not self.is_target_2d and self.num_classes >= 2:
+        if self.is_task_c1d:
             classify.update(loss_)
             if by == 'numbers':
                 classify.update({'sorted': sorted(self.correct_class.items(), key=lambda d: d[1][0], reverse=state)})
