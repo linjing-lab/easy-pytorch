@@ -166,6 +166,7 @@ class BaseModel:
         target_dtype = str(target.dtype) # __str__
         is_int_type, is_float_type = 'int' in target_dtype, 'float' in target_dtype
         self.is_target_2d = isinstance(target[0], TabularData) # judge target is 2d matrix.
+        self.is_task_c1d = not self.is_target_2d and self.num_classes >= 2 # if task is 1d classification
         if self.is_target_2d: # (n_samples, n_outputs)
             assert target.shape[1] == self.num_classes, 'Please ensure target with (n_samples, n_outputs=num_classes).'
             assert is_int_type or is_float_type, 'Please ensure target.dtype in any int or float type of numpy.dtype.'
@@ -261,20 +262,20 @@ class BaseModel:
              sort_by: str='accuracy',
              sort_state: bool=True):
         '''
-        Test with Initialized Configuration. `accuracy > 0`, 'correct_class != None'
         Configured keywords only work when `not self.is_target_2d and num_classes >= 2`.
+        Produce `self.aver_acc != 0` and 'correct_class != None' in the above condition.
         :param sort_by: str, 'accuracy', 'numbers', 'num-total'. default: 'accuracy'.
         :param sort_state: bool, whether to use descending order when sorting. default: True.
         '''
         with torch.no_grad():
             self.test_loss, test_loader_step, correct = 0, len(self.test_loader), 0
             test_total = test_loader_step * self.batch_size
-            self.correct_class = dict.fromkeys(self.unique, [0, 0]) if not self.is_target_2d and self.num_classes >= 2 else None
+            self.correct_class = dict.fromkeys(self.unique, [0, 0]) if self.is_task_c1d else None
             for features, target in self.test_loader:
                 features = features.to(self.device)
                 target = target.to(self.device)            
                 outputs = self.model(features)
-                if not self.is_target_2d and self.num_classes >= 2:
+                if self.is_task_c1d:
                     _, predicted = torch.max(outputs.data, 1)
                     for index, value in enumerate(predicted):
                         self.correct_class[self.unique[value]][1] += 1 # record total numbers of each class
@@ -282,7 +283,8 @@ class BaseModel:
                     correct += (predicted == target).sum().item()
                 self.test_loss += self.criterion(outputs, target)
             self.test_loss /= test_loader_step
-            print('loss of {0} on the {1} test dataset: {2}. accuracy: {3:.4f} %'.format(self.__class__.__name__, test_total, self.test_loss.item(), 100 * correct / test_total))
+            self.aver_acc = 100 * correct / test_total if self.is_task_c1d else None
+            print('loss of {0} on the {1} test dataset: {2}.'.format(self.__class__.__name__, test_total, self.test_loss.item()))
         return OrderedDict(self._pack_info(sort_by, sort_state))
 
     def save(self, show: bool=True, dir: str='./model') -> None:
@@ -317,6 +319,7 @@ class BaseModel:
                      'val': self.val_loss.item(),
                      'test': self.test_loss.item()}
         }, {'problem': 'classification',
+            'accuracy': f'{self.aver_acc}%',
             'num_classes': self.num_classes,
             'column': ('label name', ('true numbers', 'total numbers')),
             'labels': self.correct_class}, {'problem': 'regression'}, {'problem': 'multi-outputs'}
