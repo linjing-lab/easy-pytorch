@@ -169,7 +169,7 @@ class BaseModel:
         self.is_task_c1d = not self.is_target_2d and self.num_classes >= 2 # if task is 1d classification
         if self.is_target_2d: # (n_samples, n_outputs)
             assert target.shape[1] == self.num_classes, 'Please ensure target with (n_samples, n_outputs=num_classes).'
-            assert target.shape[1] >= 1, 'Please convert (n,1) to (n,) with numpy.squeeze(target) then explore type_of_problems.'
+            assert target.shape[1] > 1, 'Please convert (n,1) to (n,) with numpy.squeeze(target) then explore type_of_problems.'
             assert is_int_type or is_float_type, 'Please ensure target.dtype in any int or float type of numpy.dtype.'
             roc: bool = not is_int_type and is_float_type
         else: # (n_samples,)
