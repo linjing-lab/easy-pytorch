@@ -288,25 +288,25 @@ class BaseModel:
             print('loss of {0} on the {1} test dataset: {2}.'.format(self.__class__.__name__, test_total, self.test_loss.item()))
         return OrderedDict(self._pack_info(sort_by, sort_state))
 
-    def save(self, show: bool=True, dir: str='./model') -> None:
+    def save(self, con: bool=True, dir: str='./model') -> None:
         '''
         Save Model Checkpoint with Box, Regressier, Binarier, Multipler, and Ranker.
-        :param show: bool, whether to show `model.state_dict()`. default: True.
+        :param con: bool, whether to print `model.state_dict()`. default: True.
         :param dir: str, model save to dir. default: './model'.
         '''
-        if show:
+        if con:
             print(self.model.state_dict())
         torch.save(self.model.state_dict(), dir)
 
-    def load(self, show: bool=True, dir: str='./model') -> None:
+    def load(self, con: bool=True, dir: str='./model') -> None:
         '''
         Load Model Checkpoint with Box, Regressier, Binarier, Multipler, and Ranker.
-        :param show: bool, whether to show `model.state_dict()`. default: True.
+        :param con: bool, whether to print `model.state_dict()`. default: True.
         :param dir: str, model load from dir. default: './model'.
         '''
         params = torch.load(dir)
         self.model.load_state_dict(params)
-        if show:
+        if con:
             print(self.model.state_dict())
 
     def _pack_info(self, by: str, state: bool) -> Dict[str, Any]:
