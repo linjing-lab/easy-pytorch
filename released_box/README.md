@@ -75,7 +75,7 @@ tests with: PyTorch 1.7.1+cu101
 |save|con: bool=True<br />dir: str='./model'|Save Trained Model Parameters with Model `state_dict` Control by `con`.|
 |load|con: bool=True<br />dir: str='./model'|Load Trained Model Parameters with Model `state_dict` Control by `con`.|
 
-prefer replace target shape *(n,1)* with shape *(n,)* using `numpy.squeeze(target)`
+prefer replace target shape *(n,1)* with shape *(n,)* using `numpy.squeeze(target)`, users can search and combine more predefined options in submodules and its `__doc__` of each open classes.
 
 ## pip install
 

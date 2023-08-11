@@ -63,10 +63,10 @@ class BaseModel:
     :param device: Any, device configured by common models and general box.
     :param activation: Any, activated function configured by common models and general box.
     :param criterion: Any, loss function determined by common models and general box.
-    :param solver: str, optimization coordinated with `torch.optim.lr_scheduler`. (modified more params in `_solver`.)
+    :param solver: str, optimization coordinated with `torch.optim.lr_scheduler`.
     :param batch_size: int, batch size of tabular dataset in one training process.
     :param learning_rate_init: float, initialize the learning rate of the optimizer.
-    :param lr_scheduler: str | None, set the learning rate scheduler integrated with the optimizer. default: None. (modified more params in `_scheduler`.)
+    :param lr_scheduler: str | None, set the learning rate scheduler integrated with the optimizer. default: None.
     '''
     def __init__(self,
                  input_: int,
@@ -98,7 +98,8 @@ class BaseModel:
 
     def _solver(self, solver: str):
         '''
-        Configure Optimizer with `solver`.
+        Configure Optimizer with `solver` and Refer to https://pytorch.org/docs/stable/optim.html for More Optimizers.
+        Replace `stable` with your PyTorch Version for More Compatible Use, like https://pytorch.org/docs/1.7.1/optim.html.
         :param solver: str, 'sgd', 'momentum', 'adam', 'adagrad', 'rmsprop'. default: adam.
         '''
         if solver == 'sgd':
@@ -116,7 +117,8 @@ class BaseModel:
 
     def _scheduler(self, lr_scheduler: Optional[str]):
         '''
-        Configure Learning Rate Scheduler with `lr_scheduler`.
+        Configure Learning Rate Scheduler with `lr_scheduler` and Seek from https://pytorch.org/docs/stable/optim.html for More Schedulers.
+        Replace `stable` with your PyTorch Version for More Compatible Use, like https://pytorch.org/docs/1.7.1/optim.html.
         :param lr_scheduler: str, 'exponential_lr', 'step_lr', 'cosine_annealing_lr'. default: None.
         '''
         if lr_scheduler != None:
@@ -208,7 +210,7 @@ class BaseModel:
         assert tolerance > 1e-9 and tolerance < 1.0, 'Set tolerance to early stop training and validation process within patience.'
         assert patience >= 10 and patience <= 100, 'Value coordinate with tolerance should fit about num_epochs and batch_size.' 
         assert n_jobs == -1 or n_jobs > 0, 'Take full jobs with setting n_jobs=-1 or manually set nums of jobs.'
-        total_step = len(self.train_loader)
+        total_step: int = len(self.train_loader)
         self._set_container(backend, n_jobs)
         val_length: int = len(self.val_container)
         self.stop_iter: bool = False # init state of train_val
