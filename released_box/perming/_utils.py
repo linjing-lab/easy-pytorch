@@ -35,12 +35,12 @@ class MLP(torch.nn.Module):
         super(MLP, self).__init__()
         self.squeeze: bool = False if num_classes > 1 else True
         if hidden_layer_sizes: # for linear indivisible datasets
-            assert hidden_layer_sizes[0] > 0, "Please ensure any layer of hidden_layer_sizes > 0"
+            assert hidden_layer_sizes[0] > 0, 'Please ensure any layer of hidden_layer_sizes > 0'
             model_layers, hidden_length = OrderedDict(), len(hidden_layer_sizes)
             model_layers['Linear0'] = torch.nn.Linear(input_, hidden_layer_sizes[0])
             model_layers['Activation0'] = activation
             for index in range(1, hidden_length):
-                assert hidden_layer_sizes[index] > 0, "Please ensure any layer of hidden_layer_sizes > 0"
+                assert hidden_layer_sizes[index] > 0, 'Please ensure any layer of hidden_layer_sizes > 0'
                 ind_str = str(index)
                 linear_, activation_ = 'Linear'.join(('', ind_str)), 'Activation'.join(('', ind_str))
                 model_layers[linear_] = torch.nn.Linear(hidden_layer_sizes[index - 1], hidden_layer_sizes[index])
@@ -169,6 +169,7 @@ class BaseModel:
         self.is_task_c1d = not self.is_target_2d and self.num_classes >= 2 # if task is 1d classification
         if self.is_target_2d: # (n_samples, n_outputs)
             assert target.shape[1] == self.num_classes, 'Please ensure target with (n_samples, n_outputs=num_classes).'
+            assert target.shape[1] >= 1, 'Please convert (n,1) to (n,) with numpy.squeeze(target) then explore type_of_problems.'
             assert is_int_type or is_float_type, 'Please ensure target.dtype in any int or float type of numpy.dtype.'
             roc: bool = not is_int_type and is_float_type
         else: # (n_samples,)
@@ -201,7 +202,7 @@ class BaseModel:
         :param patience: int, patience of no improvement waiting for training to stop. default: 10.
         :param backend: str, 'threading', 'multiprocessing', 'locky'. default: 'threading'.
         :param n_jobs: int, accelerate processing of validation. default: -1.
-        :param early_stop: bool, whether to enable early_stop in train_val. default: False
+        :param early_stop: bool, whether to enable early_stop in train_val. default: False.
         '''
         assert num_epochs > 0 and interval > 0, 'With num_epochs > 0 and interval > 0 to train parameters into outputs.'
         assert tolerance > 1e-9 and tolerance < 1.0, 'Set tolerance to early stop training and validation process within patience.'
