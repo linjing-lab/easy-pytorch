@@ -4,7 +4,7 @@ perming: Perceptron Models Are Training on Windows Platform with Default GPU Acc
 
 - p: use polars or pandas to read dataset.
 - per: perceptron algorithm used as based model.
-- m: models concluding Box, Regressier， Binarier, Mutipler and Ranker.
+- m: models include Box, Regressier, Binarier, Mutipler and Ranker.
 - ing: training on windows platform with strong gpu acceleration.
 
 ## init backend
@@ -17,7 +17,7 @@ tests with: PyTorch 1.7.1+cu101
 
 |GENERAL_BOX(Box)|Parameters|Meaning|
 |--|--|--|
-|`__init__`|input_: int<br />num_classes: int<br />hidden_layer_sizes: Tuple[int]=(100,)<br />device: str="cuda"<br />*<br />activation: str="relu"<br />inplace_on: bool=True<br />criterion: str="CrossEntropyLoss"<br />solver: str="adam"<br />batch_size: int=32<br />learning_rate_init: float=1e-2<br />lr_scheduler: Optional[str]=None|Initialize Classifier or Regressier Based on Basic Information of the Dataset Obtained through Data Preprocessing and Feature Engineering.|
+|`__init__`|input_: int<br />num_classes: int<br />hidden_layer_sizes: Tuple[int]=(100,)<br />device: str="cuda"<br />*<br />activation: str="relu"<br />inplace_on: bool=False<br />criterion: str="CrossEntropyLoss"<br />solver: str="adam"<br />batch_size: int=32<br />learning_rate_init: float=1e-2<br />lr_scheduler: Optional[str]=None|Initialize Classifier or Regressier Based on Basic Information of the Dataset Obtained through Data Preprocessing and Feature Engineering.|
 |print_config|/|Return Initialized Parameters of Multi-layer Perceptron and Graph.|
 |data_loader|features: TabularData<br />labels: TabularData<br />ratio_set: Dict[str, int]={'train': 8, 'test': 1, 'val': 1}<br />worker_set: Dict[str, int]={'train': 8, 'test': 2, 'val': 1}<br />random_seed: Optional[int]=None|Using `ratio_set` and `worker_set` to Load the Numpy Dataset into `torch.utils.data.DataLoader`.|
 |train_val|num_epochs: int=2<br />tolerance: float=1e-3<br />patience: int=10<br />interval: int=100<br />backend: str="threading"<br />n_jobs: int=-1<br />early_stop: bool=False|Using `num_epochs`, `tolerance`, `patience` to Control Training Process and `interval` to Adjust Print Interval with Accelerated Validation Combined with `backend` and `n_jobs`.|
