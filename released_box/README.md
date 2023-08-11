@@ -4,14 +4,14 @@ perming: Perceptron Models Are Training on Windows Platform with Default GPU Acc
 
 - p: use polars or pandas to read dataset.
 - per: perceptron algorithm used as based model.
-- m: models concluding regressier and classifier (binary & multiple).
+- m: models concluding Box, Regressier， Binarier, Mutipler and Ranker.
 - ing: training on windows platform with strong gpu acceleration.
 
 ## init backend
  
-refer to https://pytorch.org/get-started/locally/ and choose the PyTorch that support `cuda` compatible with your Windows. The current software version only supports Windows system.
+refer to https://pytorch.org/get-started/locally/ and choose the PyTorch that support `cuda` compatible with your Windows.
 
-test with: PyTorch 1.7.1+cu101
+tests with: PyTorch 1.7.1+cu101
 
 ## general model
 
@@ -22,8 +22,8 @@ test with: PyTorch 1.7.1+cu101
 |data_loader|features: TabularData<br />labels: TabularData<br />ratio_set: Dict[str, int]={'train': 8, 'test': 1, 'val': 1}<br />worker_set: Dict[str, int]={'train': 8, 'test': 2, 'val': 1}<br />random_seed: Optional[int]=None|Using `ratio_set` and `worker_set` to Load the Numpy Dataset into `torch.utils.data.DataLoader`.|
 |train_val|num_epochs: int=2<br />tolerance: float=1e-3<br />patience: int=10<br />interval: int=100<br />backend: str="threading"<br />n_jobs: int=-1<br />early_stop: bool=False|Using `num_epochs`, `tolerance`, `patience` to Control Training Process and `interval` to Adjust Print Interval with Accelerated Validation Combined with `backend` and `n_jobs`.|
 |test|sort_by: str="accuracy"<br />sort_state: bool=True|Sort Returned Test Result about Correct Classes with `sort_by` and `sort_state` Which Only Appears in Classification.|
-|save|show: bool=True<br />dir: str='./model'|Save Trained Model Parameters with Model `state_dict` Control by `show`.|
-|load|show: bool=True<br />dir: str='./model'|Load Trained Model Parameters with Model `state_dict` Control by `show`.|
+|save|con: bool=True<br />dir: str='./model'|Save Trained Model Parameters with Model `state_dict` Control by `con`.|
+|load|con: bool=True<br />dir: str='./model'|Load Trained Model Parameters with Model `state_dict` Control by `con`.|
 
 ## common models (cuda first)
 
@@ -75,7 +75,7 @@ test with: PyTorch 1.7.1+cu101
 |save|con: bool=True<br />dir: str='./model'|Save Trained Model Parameters with Model `state_dict` Control by `con`.|
 |load|con: bool=True<br />dir: str='./model'|Load Trained Model Parameters with Model `state_dict` Control by `con`.|
 
-prefer replace target shape *(n,1)* with shape *(n,)* using `numpy.squeeze(input_matrix)`
+prefer replace target shape *(n,1)* with shape *(n,)* using `numpy.squeeze(target)`
 
 ## pip install
 
