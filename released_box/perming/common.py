@@ -13,7 +13,7 @@ class Regressier(BaseModel):
     :param solver: str, optimization function initialized with `learning_rate_init`. default: adam.
     :param batch_size: int, batch size of dataset in one training and validation process. default: 32.
     :param learning_rate_init: float, initialize the learning rate of the optimizer. default: 1e-2.
-    :param lr_scheduler: str | None, set the learning rate scheduler integrated with the optimizer. default: None.
+    :param lr_scheduler: str | None, set the learning rate scheduler integrated with optimizer. default: None.
     '''
     def __init__(self, 
                  input_: int, 
@@ -81,7 +81,7 @@ class Binarier(BaseModel):
     :param solver: str, optimization function coordinated with `torch.optim.lr_scheduler`. default: adam.
     :param batch_size: int, batch size of dataset in one training and validation process. default: 32.
     :param learning_rate_init: float, initialize the learning rate of the optimizer. default: 1e-2.
-    :param lr_scheduler: str | None, set the learning rate scheduler integrated with the optimizer. default: None.
+    :param lr_scheduler: str | None, set the learning rate scheduler integrated with optimizer. default: None.
     '''
     def __init__(self, 
                  input_: int, 
@@ -150,7 +150,7 @@ class Mutipler(BaseModel):
     :param solver: str, optimization function coordinated with `torch.optim.lr_scheduler`. default: adam.
     :param batch_size: int, batch size of dataset in one training and validation process. default: 32.
     :param learning_rate_init: float, initialize the learning rate of the optimizer. default: 1e-2.
-    :param lr_scheduler: str | None, set the learning rate scheduler integrated with the optimizer. default: None.
+    :param lr_scheduler: str | None, set the learning rate scheduler integrated with optimizer. default: None.
     '''
     def __init__(self, 
                  input_: int, 
@@ -217,7 +217,7 @@ class Ranker(BaseModel):
     :param solver: str, optimization function coordinated with `torch.optim.lr_scheduler`. default: adam.
     :param batch_size: int, batch size of dataset in one training and validation process. default: 32.
     :param learning_rate_init: float, initialize the learning rate of the optimizer. default: 1e-2.
-    :param lr_scheduler: str | None, set the learning rate scheduler integrated with the optimizer. default: None.
+    :param lr_scheduler: str | None, set the learning rate scheduler integrated with optimizer. default: None.
     '''
     def __init__(self, 
                  input_: int, 

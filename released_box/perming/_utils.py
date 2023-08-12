@@ -66,7 +66,7 @@ class BaseModel:
     :param solver: str, optimization coordinated with `torch.optim.lr_scheduler`.
     :param batch_size: int, batch size of tabular dataset in one training process.
     :param learning_rate_init: float, initialize the learning rate of the optimizer.
-    :param lr_scheduler: str | None, set the learning rate scheduler integrated with the optimizer. default: None.
+    :param lr_scheduler: str | None, set the learning rate scheduler integrated with optimizer. default: None.
     '''
     def __init__(self,
                  input_: int,
@@ -100,36 +100,40 @@ class BaseModel:
         '''
         Configure Optimizer with `solver` and Refer to https://pytorch.org/docs/stable/optim.html for More Optimizers.
         Replace `stable` with your PyTorch Version for More Compatible Use, like https://pytorch.org/docs/1.7.1/optim.html.
-        :param solver: str, 'sgd', 'momentum', 'adam', 'adagrad', 'rmsprop'. default: adam.
+        :param solver: str, 'sgd', 'momentum', 'adam', 'adagrad', 'adadelta', 'rmsprop'. default: adam.
         '''
         if solver == 'sgd':
-            return torch.optim.SGD(self.model.parameters(), lr=self.lr)
+            return torch.optim.SGD(self.model.parameters(), lr=self.lr, weight_decay=0)
         elif solver == 'adam':
-            return torch.optim.Adam(self.model.parameters(), lr=self.lr, betas=(0.9, 0.99))
+            return torch.optim.Adam(self.model.parameters(), lr=self.lr, betas=(0.9,0.99), eps=1e-08, weight_decay=0)
         elif solver == 'momentum':
-            return torch.optim.SGD(self.model.parameters(), lr=self.lr, momentum=0.9, nesterov=True)
+            return torch.optim.SGD(self.model.parameters(), lr=self.lr, momentum=0.9, weight_decay=0, dampening=0, nesterov=True)
         elif solver == 'adagrad':
-            return torch.optim.Adagrad(self.model.parameters(), lr=self.lr)
+            return torch.optim.Adagrad(self.model.parameters(), lr=self.lr, lr_decay=0, weight_decay=0)
+        elif solver == 'adadelta':
+            return torch.optim.Adadelta(self.model.parameters(), lr=self.lr, rho=0.9, eps=1e-06, weight_decay=0)
         elif solver == 'rmsprop':
-            return torch.optim.RMSprop(self.model.parameters(), lr=self.lr, alpha=0.9)
+            return torch.optim.RMSprop(self.model.parameters(), lr=self.lr, momentum=0, alpha=0.99, eps=1e-08, weight_decay=0, centered=False)
         else:
-            raise ValueError("Optimizer Configuration Supports Options: sgd, momentum, adam, adagrad, rmsprop.")
+            raise ValueError("Optimizer Configuration Supports Options: sgd, momentum, adam, adagrad, adadelta, rmsprop.")
 
     def _scheduler(self, lr_scheduler: Optional[str]):
         '''
         Configure Learning Rate Scheduler with `lr_scheduler` and Seek from https://pytorch.org/docs/stable/optim.html for More Schedulers.
         Replace `stable` with your PyTorch Version for More Compatible Use, like https://pytorch.org/docs/1.7.1/optim.html.
-        :param lr_scheduler: str, 'exponential_lr', 'step_lr', 'cosine_annealing_lr'. default: None.
+        :param lr_scheduler: str, 'exponential_lr', 'step_lr', 'multi_step_lr', 'cosine_annealing_lr'. default: None.
         '''
         if lr_scheduler != None:
             if lr_scheduler == 'exponential_lr':
                 return torch.optim.lr_scheduler.ExponentialLR(self.solver, gamma=0.1)
             elif lr_scheduler == 'step_lr':
-                return torch.optim.lr_scheduler.StepLR(self.solver, step_size=2, gamma=0.1)
+                return torch.optim.lr_scheduler.StepLR(self.solver, step_size=10, gamma=0.1)
+            elif lr_scheduler == 'multi_step_lr':
+                return torch.optim.lr_scheduler.MultiStepLR(self.solver, milestones=[30,80], gamma=0.1)
             elif lr_scheduler == 'cosine_annealing_lr':
                 return torch.optim.lr_scheduler.CosineAnnealingLR(self.solver, T_max=10, eta_min=0)
             else:
-                raise ValueError("Learning Rate Scheduler Supports Options: exponential_lr, step_lr, cosine_annealing_lr.")
+                raise ValueError("Learning Rate Scheduler Supports Options: exponential_lr, step_lr, multi_step_lr, cosine_annealing_lr.")
 
     def print_config(self):
         '''

@@ -13,15 +13,55 @@ refer to https://pytorch.org/get-started/locally/ and choose the PyTorch that su
 
 tests with: PyTorch 1.7.1+cu101
 
+## parameters
+
+init:
+- input_: *int*, feature dimensions of tabular datasets after extract, transform, load from any data sources.
+- num_classes: *int*, define numbers of classes or outputs after users defined the type of task with layer output.
+- hidden_layer_sizes: *Tuple[int]=(100,)*, define numbers and sizes of hidden layers to enhance model representation.
+- device: *str='cuda'*, configure training and validation device with torch.device options. 'cuda' or 'cpu'.
+- activation: *str='relu'*, configure activation function combined with subsequent learning task. see _activate in open models.
+- inplace_on: *bool=False*, configure whether to enbale inplace=True on activation. False or True. (manually set in Box)
+- criterion: *str='CrossEntropyLoss'*, configure loss criterion with compatible learning task output. see _criterion in open models.
+- solver: *str='adam'*, configure inner optimizer serve as learning solver for learning task. see _solver in _utils/BaseModel.
+- batch_size: *int=32*, define batch size on loaded dataset of one epoch training process. any int value > 0. (prefer 2^n)
+- learning_rate_init: *float=1e-2*, define initial learning rate of solver input param controled by inner assertion. (1e-6, 1.0).
+- lr_scheduler: *Optional[str]=None*, configure scheduler about learning rate decay for compatible use. see _scheduler in _utils/BaseModel.
+
+data_loader:
+- features: *TabularData*, manually input by users.
+- target: *TabularData*, manually input by users.
+- ratio_set: *Dict[str, int]={'train': 8, 'test': 1, 'val': 1}*, define by users.
+- worker_set: *Dict[str, int]={'train': 8, 'test': 2, 'val': 1}*, manually set by users need.
+- random_seed: *Optional[int]=None*, manually set any int value by users to fixed sequence.
+
+train_val:
+- num_epochs: *int=2*, define numbers of epochs in main training cycle. any int value > 0.
+- interval: *int=100*, define console print length of whole epochs by interval. any int value > 0.
+- tolerance: *float=1e-3*, define tolerance used to set inner break sensitivity. (1e-9, 1.0).
+- patience: *int=10*, define value coordinate with tolerance to expand detect length. [10, 100].
+- backend: *str='threading'*, configure accelerate backend used in inned process. 'threading', 'multiprocessing', 'locky'.
+- n_jobs: *int=-1*, define numbers of jobs with manually set by users need. -1 or any int value > 0.
+- early_stop: *bool=False*, define whether to enable early_stop process. False or True.
+
+test:
+- sort_by: *str='accuracy'*, configure sorted ways of correct_class. 'numbers', 'accuracy', 'num-total'.
+- sort_state: *bool=True*, configure sorted state of correct_class. False or True.
+
+save or load:
+- con: *bool=True*, configure whether to print model.state_dict(). False or True.
+- dir: *dir='./model'*, configure model path that *save to* or *load from*. correct path defined by users.
+
+
 ## general model
 
 |GENERAL_BOX(Box)|Parameters|Meaning|
 |--|--|--|
-|`__init__`|input_: int<br />num_classes: int<br />hidden_layer_sizes: Tuple[int]=(100,)<br />device: str="cuda"<br />*<br />activation: str="relu"<br />inplace_on: bool=False<br />criterion: str="CrossEntropyLoss"<br />solver: str="adam"<br />batch_size: int=32<br />learning_rate_init: float=1e-2<br />lr_scheduler: Optional[str]=None|Initialize Classifier or Regressier Based on Basic Information of the Dataset Obtained through Data Preprocessing and Feature Engineering.|
+|`__init__`|input_: int<br />num_classes: int<br />hidden_layer_sizes: Tuple[int]=(100,)<br />device: str='cuda'<br />*<br />activation: str='relu'<br />inplace_on: bool=False<br />criterion: str='CrossEntropyLoss'<br />solver: str='adam'<br />batch_size: int=32<br />learning_rate_init: float=1e-2<br />lr_scheduler: Optional[str]=None|Initialize Classifier or Regressier Based on Basic Information of the Dataset Obtained through Data Preprocessing and Feature Engineering.|
 |print_config|/|Return Initialized Parameters of Multi-layer Perceptron and Graph.|
 |data_loader|features: TabularData<br />labels: TabularData<br />ratio_set: Dict[str, int]={'train': 8, 'test': 1, 'val': 1}<br />worker_set: Dict[str, int]={'train': 8, 'test': 2, 'val': 1}<br />random_seed: Optional[int]=None|Using `ratio_set` and `worker_set` to Load the Numpy Dataset into `torch.utils.data.DataLoader`.|
-|train_val|num_epochs: int=2<br />tolerance: float=1e-3<br />patience: int=10<br />interval: int=100<br />backend: str="threading"<br />n_jobs: int=-1<br />early_stop: bool=False|Using `num_epochs`, `tolerance`, `patience` to Control Training Process and `interval` to Adjust Print Interval with Accelerated Validation Combined with `backend` and `n_jobs`.|
-|test|sort_by: str="accuracy"<br />sort_state: bool=True|Sort Returned Test Result about Correct Classes with `sort_by` and `sort_state` Which Only Appears in Classification.|
+|train_val|num_epochs: int=2<br />interval: int=100<br />tolerance: float=1e-3<br />patience: int=10<br />backend: str='threading'<br />n_jobs: int=-1<br />early_stop: bool=False|Using `num_epochs`, `tolerance`, `patience` to Control Training Process and `interval` to Adjust Print Interval with Accelerated Validation Combined with `backend` and `n_jobs`.|
+|test|sort_by: str='accuracy'<br />sort_state: bool=True|Sort Returned Test Result about Correct Classes with `sort_by` and `sort_state` Which Only Appears in Classification.|
 |save|con: bool=True<br />dir: str='./model'|Save Trained Model Parameters with Model `state_dict` Control by `con`.|
 |load|con: bool=True<br />dir: str='./model'|Load Trained Model Parameters with Model `state_dict` Control by `con`.|
 
@@ -31,10 +71,10 @@ tests with: PyTorch 1.7.1+cu101
 
 |Regressier|Parameters|Meaning|
 |--|--|--|
-|`__init__`|input_: int<br />hidden_layer_sizes: Tuple[int]=(100,)<br />*<br />activation: str="relu"<br />criterion: str="MSELoss"<br />solver: str="adam"<br />batch_size: int=32<br />learning_rate_init: float=1e-2<br />lr_scheduler: Optional[str]=None|Initialize Regressier Based on Basic Information of the Regression Dataset Obtained through Data Preprocessing and Feature Engineering with `num_classes=1`.|
+|`__init__`|input_: int<br />hidden_layer_sizes: Tuple[int]=(100,)<br />*<br />activation: str='relu'<br />criterion: str='MSELoss'<br />solver: str='adam'<br />batch_size: int=32<br />learning_rate_init: float=1e-2<br />lr_scheduler: Optional[str]=None|Initialize Regressier Based on Basic Information of the Regression Dataset Obtained through Data Preprocessing and Feature Engineering with `num_classes=1`.|
 |print_config|/|Return Initialized Parameters of Multi-layer Perceptron and Graph.|
 |data_loader|features: TabularData<br />labels: TabularData<br />ratio_set: Dict[str, int]={'train': 8, 'test': 1, 'val': 1}<br />worker_set: Dict[str, int]={'train': 8, 'test': 2, 'val': 1}<br />random_seed: Optional[int]=None|Using `ratio_set` and `worker_set` to Load the Regression Dataset with Numpy format into `torch.utils.data.DataLoader`.|
-|train_val|num_epochs: int=2<br />interval: int=100<br />tolerance: float=1e-3<br />patience: int=10<br />backend: str="threading"<br />n_jobs: int=-1<br />early_stop: bool=False|Using `num_epochs`, `tolerance`, `patience` to Control Training Process and `interval` to Adjust Print Interval with Accelerated Validation Combined with `backend` and `n_jobs`.|
+|train_val|num_epochs: int=2<br />interval: int=100<br />tolerance: float=1e-3<br />patience: int=10<br />backend: str='threading'<br />n_jobs: int=-1<br />early_stop: bool=False|Using `num_epochs`, `tolerance`, `patience` to Control Training Process and `interval` to Adjust Print Interval with Accelerated Validation Combined with `backend` and `n_jobs`.|
 |test|/|Test Module Only Show with Loss at 3 Stages: Train, Test, Val|
 |save|con: bool=True<br />dir: str='./model'|Save Trained Model Parameters with Model `state_dict` Control by `con`.|
 |load|con: bool=True<br />dir: str='./model'|Load Trained Model Parameters with Model `state_dict` Control by `con`.|
@@ -43,11 +83,11 @@ tests with: PyTorch 1.7.1+cu101
 
 |Binarier|Parameters|Meaning|
 |--|--|--|
-|`__init__`|input_: int<br />hidden_layer_sizes: Tuple[int]=(100,)<br />*<br />activation: str="relu"<br />criterion: str="BCELoss"<br />solver: str="adam"<br />batch_size: int=32<br />learning_rate_init: float=1e-2<br />lr_scheduler: Optional[str]=None|Initialize Classifier Based on Basic Information of the Classification Dataset Obtained through Data Preprocessing and Feature Engineering with `num_classes=2`.|
+|`__init__`|input_: int<br />hidden_layer_sizes: Tuple[int]=(100,)<br />*<br />activation: str='relu'<br />criterion: str='BCELoss'<br />solver: str='adam'<br />batch_size: int=32<br />learning_rate_init: float=1e-2<br />lr_scheduler: Optional[str]=None|Initialize Classifier Based on Basic Information of the Classification Dataset Obtained through Data Preprocessing and Feature Engineering with `num_classes=2`.|
 |print_config|/|Return Initialized Parameters of Multi-layer Perceptron and Graph.|
 |data_loader|features: TabularData<br />labels: TabularData<br />ratio_set: Dict[str, int]={'train': 8, 'test': 1, 'val': 1}<br />worker_set: Dict[str, int]={'train': 8, 'test': 2, 'val': 1}<br />random_seed: Optional[int]=None|Using `ratio_set` and `worker_set` to Load the Binary-classification Dataset with Numpy format into `torch.utils.data.DataLoader`.|
-|train_val|num_epochs: int=2<br />interval: int=100<br />tolerance: float=1e-3<br />patience: int=10<br />backend: str="threading"<br />n_jobs: int=-1<br />early_stop: bool=False|Using `num_epochs`, `tolerance`, `patience` to Control Training Process and `interval` to Adjust Print Interval with Accelerated Validation Combined with `backend` and `n_jobs`.|
-|test|sort_by: str="accuracy"<br />sort_state: bool=True|Test Module con with Correct Class and Loss at 3 Stages: Train, Test, Val|
+|train_val|num_epochs: int=2<br />interval: int=100<br />tolerance: float=1e-3<br />patience: int=10<br />backend: str='threading'<br />n_jobs: int=-1<br />early_stop: bool=False|Using `num_epochs`, `tolerance`, `patience` to Control Training Process and `interval` to Adjust Print Interval with Accelerated Validation Combined with `backend` and `n_jobs`.|
+|test|sort_by: str='accuracy'<br />sort_state: bool=True|Test Module con with Correct Class and Loss at 3 Stages: Train, Test, Val|
 |save|con: bool=True<br />dir: str='./model'|Save Trained Model Parameters with Model `state_dict` Control by `con`.|
 |load|con: bool=True<br />dir: str='./model'|Load Trained Model Parameters with Model `state_dict` Control by `con`.|
 
@@ -55,11 +95,11 @@ tests with: PyTorch 1.7.1+cu101
 
 |Multipler|Parameters|Meaning|
 |--|--|--|
-|`__init__`|input_: int<br />num_classes: int<br />hidden_layer_sizes: Tuple[int]=(100,)<br />*<br />activation: str="relu"<br />criterion: str="CrossEntropyLoss"<br />solver: str="adam"<br />batch_size: int=32<br />learning_rate_init: float=1e-2<br />lr_scheduler: Optional[str]=None|Initialize Classifier Based on Basic Information of the Classification Dataset Obtained through Data Preprocessing and Feature Engineering with `num_classes>2`.|
+|`__init__`|input_: int<br />num_classes: int<br />hidden_layer_sizes: Tuple[int]=(100,)<br />*<br />activation: str='relu'<br />criterion: str='CrossEntropyLoss'<br />solver: str='adam'<br />batch_size: int=32<br />learning_rate_init: float=1e-2<br />lr_scheduler: Optional[str]=None|Initialize Classifier Based on Basic Information of the Classification Dataset Obtained through Data Preprocessing and Feature Engineering with `num_classes>2`.|
 |print_config|/|Return Initialized Parameters of Multi-layer Perceptron and Graph.|
 |data_loader|features: TabularData<br />labels: TabularData<br />ratio_set: Dict[str, int]={'train': 8, 'test': 1, 'val': 1}<br />worker_set: Dict[str, int]={'train': 8, 'test': 2, 'val': 1}<br />random_seed: Optional[int]=None|Using `ratio_set` and `worker_set` to Load the Multi-classification Dataset with Numpy format into `torch.utils.data.DataLoader`.|
-|train_val|num_epochs: int=2<br />interval: int=100<br />tolerance: float=1e-3<br />patience: int=10<br />backend: str="threading"<br />n_jobs: int=-1<br />early_stop: bool=False|Using `num_epochs`, `tolerance`, `patience` to Control Training Process and `interval` to Adjust Print Interval with Accelerated Validation Combined with `backend` and `n_jobs`.|
-|test|sort_by: str="accuracy"<br />sort_state: bool=True|Sort Returned Test Result about Correct Classes with `sort_by` and `sort_state` Which Only Appears in Classification.|
+|train_val|num_epochs: int=2<br />interval: int=100<br />tolerance: float=1e-3<br />patience: int=10<br />backend: str='threading'<br />n_jobs: int=-1<br />early_stop: bool=False|Using `num_epochs`, `tolerance`, `patience` to Control Training Process and `interval` to Adjust Print Interval with Accelerated Validation Combined with `backend` and `n_jobs`.|
+|test|sort_by: str='accuracy'<br />sort_state: bool=True|Sort Returned Test Result about Correct Classes with `sort_by` and `sort_state` Which Only Appears in Classification.|
 |save|con: bool=True<br />dir: str='./model'|Save Trained Model Parameters with Model `state_dict` Control by `con`.|
 |load|con: bool=True<br />dir: str='./model'|Load Trained Model Parameters with Model `state_dict` Control by `con`.|
 
@@ -67,11 +107,11 @@ tests with: PyTorch 1.7.1+cu101
 
 |Ranker|Parameters|Meaning|
 |--|--|--|
-|`__init__`|input_: int<br />num_outputs: int<br />hidden_layer_sizes: Tuple[int]=(100,)<br />*<br />activation: str="relu"<br />criterion: str="MultiLabelSoftMarginLoss"<br />solver: str="adam"<br />batch_size: int=32<br />learning_rate_init: float=1e-2<br />lr_scheduler: Optional[str]=None|Initialize Ranker Based on Basic Information of the Classification Dataset Obtained through Data Preprocessing and Feature Engineering with (n_samples, n_outputs).|
+|`__init__`|input_: int<br />num_outputs: int<br />hidden_layer_sizes: Tuple[int]=(100,)<br />*<br />activation: str='relu'<br />criterion: str='MultiLabelSoftMarginLoss'<br />solver: str='adam'<br />batch_size: int=32<br />learning_rate_init: float=1e-2<br />lr_scheduler: Optional[str]=None|Initialize Ranker Based on Basic Information of the Classification Dataset Obtained through Data Preprocessing and Feature Engineering with (n_samples, n_outputs).|
 |print_config|/|Return Initialized Parameters of Multi-layer Perceptron and Graph.|
 |data_loader|features: TabularData<br />labels: TabularData<br />ratio_set: Dict[str, int]={'train': 8, 'test': 1, 'val': 1}<br />worker_set: Dict[str, int]={'train': 8, 'test': 2, 'val': 1}<br />random_seed: Optional[int]=None|Using `ratio_set` and `worker_set` to Load the Multi-outputs Dataset with Numpy format into `torch.utils.data.DataLoader`.|
-|train_val|num_epochs: int=2<br />interval: int=100<br />tolerance: float=1e-3<br />patience: int=10<br />backend: str="threading"<br />n_jobs: int=-1<br />early_stop: bool=False|Using `num_epochs`, `tolerance`, `patience` to Control Training Process and `interval` to Adjust Print Interval with Accelerated Validation Combined with `backend` and `n_jobs`.|
-|test|sort_by: str="accuracy"<br />sort_state: bool=True|Sort Returned Test Result about Correct Classes with `sort_by` and `sort_state` Which Only Appears in Classification.|
+|train_val|num_epochs: int=2<br />interval: int=100<br />tolerance: float=1e-3<br />patience: int=10<br />backend: str='threading'<br />n_jobs: int=-1<br />early_stop: bool=False|Using `num_epochs`, `tolerance`, `patience` to Control Training Process and `interval` to Adjust Print Interval with Accelerated Validation Combined with `backend` and `n_jobs`.|
+|test|sort_by: str='accuracy'<br />sort_state: bool=True|Sort Returned Test Result about Correct Classes with `sort_by` and `sort_state` Which Only Appears in Classification.|
 |save|con: bool=True<br />dir: str='./model'|Save Trained Model Parameters with Model `state_dict` Control by `con`.|
 |load|con: bool=True<br />dir: str='./model'|Load Trained Model Parameters with Model `state_dict` Control by `con`.|
 
