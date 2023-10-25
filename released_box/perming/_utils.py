@@ -1,7 +1,7 @@
 # Copyright (c) 2023 linjing-lab
 
 import torch, random, numpy, gc
-from joblib import parallel_backend
+from joblib import parallel_backend, Parallel, delayed
 from collections import OrderedDict
 from ._typing import TabularData, Tuple, Dict, Optional, Any
 from ._version import parse_torch_version
@@ -134,6 +134,14 @@ class BaseModel:
                 return torch.optim.lr_scheduler.CosineAnnealingLR(self.solver, T_max=10, eta_min=0)
             else:
                 raise ValueError("Learning Rate Scheduler Supports Options: exponential_lr, step_lr, multi_step_lr, cosine_annealing_lr.")
+            
+    def _val_acc(self, set: torch.Tensor):
+        '''
+        Accumulate Loss Value in Validation Stage.
+        :param set: torch.Tensor. unordered validation sets coming from val_dataloader.
+        '''
+        outputs_val = self.model(set[0].to(self.device)) # return value from cuda
+        self.val_loss += self.criterion(outputs_val, set[1].to(self.device))
 
     def print_config(self):
         '''
@@ -237,9 +245,7 @@ class BaseModel:
                 # validation with val_container
                 self.val_loss = 0 # int value at cpu
                 with parallel_backend(backend, n_jobs=n_jobs):
-                    for val_set in self.val_container:
-                        outputs_val = self.model(val_set[0].to(self.device)) # return value from cuda
-                        self.val_loss += self.criterion(outputs_val, val_set[1].to(self.device))
+                    Parallel()(delayed(self._val_acc)(val_set) for val_set in self.val_container)     
                 self.val_loss /= val_length
                 val_counts = i + 1 + total_step * epoch # times of val_loss renewed
 
