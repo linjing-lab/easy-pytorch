@@ -223,7 +223,7 @@ class BaseModel:
         assert patience >= 10 and patience <= 100, 'Value coordinate with tolerance should fit about num_epochs and batch_size.' 
         assert n_jobs == -1 or n_jobs > 0, 'Take full jobs with setting n_jobs=-1 or manually set nums of jobs.'
         total_step: int = len(self.train_loader)
-        self._set_container(backend, n_jobs)
+        self.val_container = [*iter(self.val_loader)] # replace previous versions of _set_container
         val_length: int = len(self.val_container)
         self.stop_iter: bool = False # init state of train_val
         for epoch in range(num_epochs):
@@ -356,20 +356,6 @@ class BaseModel:
             else:
                 regress.update(loss_)
                 return regress
-
-    def _set_container(self, backend: str, n_jobs: int) -> None:
-        '''
-        Validation Container with `parallel_backend` at `n_jobs`.
-        :param backend: str, "threading", "multiprocessing, 'loky'.
-        :param n_jobs: int, set jobs with backend to accelerate process.
-        '''
-        with parallel_backend(backend, n_jobs=n_jobs):
-            val_iter, self.val_container = iter(self.val_loader), []
-            while 1:
-                try:
-                    self.val_container.append(next(val_iter))
-                except StopIteration:
-                    break
 
 def train_test_val_split(features: TabularData, target: TabularData, ratio_set: Dict[str, int], random_seed: Optional[int]) -> Tuple[Dict[str, TabularData]]:
     '''
