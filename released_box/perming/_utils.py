@@ -206,7 +206,7 @@ class BaseModel:
         :param interval: int, console output interval. default: 100.
         :param tolerance: float, tolerance set to judge difference in val_loss. default: 1e-3
         :param patience: int, patience of no improvement waiting for training to stop. default: 10.
-        :param backend: str, 'threading', 'multiprocessing', 'locky'. default: 'threading'.
+        :param backend: str, 'threading', 'multiprocessing', 'loky'. default: 'threading'.
         :param n_jobs: int, accelerate processing of validation. default: -1.
         :param early_stop: bool, whether to enable early_stop in train_val. default: False.
         '''
@@ -354,7 +354,7 @@ class BaseModel:
     def _set_container(self, backend: str, n_jobs: int) -> None:
         '''
         Validation Container with `parallel_backend` at `n_jobs`.
-        :param backend: str, "threading", "multiprocessing, 'locky'.
+        :param backend: str, "threading", "multiprocessing, 'loky'.
         :param n_jobs: int, set jobs with backend to accelerate process.
         '''
         with parallel_backend(backend, n_jobs=n_jobs):
