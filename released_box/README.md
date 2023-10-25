@@ -9,7 +9,7 @@ perming: Perceptron Models Are Training on Windows Platform with Default GPU Acc
 
 ## init backend
  
-refer to https://pytorch.org/get-started/locally/ and choose the PyTorch that support `cuda` compatible with your Windows.
+refer to https://pytorch.org/get-started/locally/ and choose PyTorch that support `cuda` compatible with your Windows.
 
 tests with: PyTorch 1.7.1+cu101
 
@@ -21,7 +21,7 @@ init:
 - hidden_layer_sizes: *Tuple[int]=(100,)*, define numbers and sizes of hidden layers to enhance model representation.
 - device: *str='cuda'*, configure training and validation device with torch.device options. 'cuda' or 'cpu'.
 - activation: *str='relu'*, configure activation function combined with subsequent learning task. see _activate in open models.
-- inplace_on: *bool=False*, configure whether to enbale inplace=True on activation. False or True. (manually set in Box)
+- inplace_on: *bool=False*, configure whether to enable inplace=True on activation. False or True. (manually set in Box)
 - criterion: *str='CrossEntropyLoss'*, configure loss criterion with compatible learning task output. see _criterion in open models.
 - solver: *str='adam'*, configure inner optimizer serve as learning solver for learning task. see _solver in _utils/BaseModel.
 - batch_size: *int=32*, define batch size on loaded dataset of one epoch training process. any int value > 0. (prefer 2^n)
@@ -40,7 +40,7 @@ train_val:
 - interval: *int=100*, define console print length of whole epochs by interval. any int value > 0.
 - tolerance: *float=1e-3*, define tolerance used to set inner break sensitivity. (1e-9, 1.0).
 - patience: *int=10*, define value coordinate with tolerance to expand detect length. [10, 100].
-- backend: *str='threading'*, configure accelerate backend used in inned process. 'threading', 'multiprocessing', 'locky'.
+- backend: *str='threading'*, configure accelerate backend used in inner process. 'threading', 'multiprocessing', 'loky'.
 - n_jobs: *int=-1*, define numbers of jobs with manually set by users need. -1 or any int value > 0.
 - early_stop: *bool=False*, define whether to enable early_stop process. False or True.
 
