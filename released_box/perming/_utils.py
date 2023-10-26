@@ -223,7 +223,7 @@ class BaseModel:
         assert patience >= 10 and patience <= 100, 'Value coordinate with tolerance should fit about num_epochs and batch_size.' 
         assert n_jobs == -1 or n_jobs > 0, 'Take full jobs with setting n_jobs=-1 or manually set nums of jobs.'
         total_step: int = len(self.train_loader)
-        self.val_container = [*iter(self.val_loader)] # replace previous versions of _set_container
+        self.val_container = [set for set in self.val_loader] # replace [*iter] to avoid memory burden in jupyter kernel
         val_length: int = len(self.val_container)
         self.stop_iter: bool = False # init state of train_val
         for epoch in range(num_epochs):
