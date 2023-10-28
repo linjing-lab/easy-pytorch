@@ -44,7 +44,7 @@ train_val:
 - tolerance: *float=1e-3*, define tolerance used to set inner break sensitivity. (1e-9, 1.0).
 - patience: *int=10*, define value coordinate with tolerance to expand detect length. [10, 100].
 - backend: *str='threading'*, configure accelerate backend used in inner process. 'threading', 'multiprocessing', 'loky'.
-- n_jobs: *int=-1*, define numbers of jobs with manually set by users need. -1 or any int value > 0.
+- n_jobs: *int=-1*, define numbers of jobs with manually set by users need. -1 or any int value > 0. (if n_jobs=1, parallel processing will be turn off to save cuda memory.)
 - early_stop: *bool=False*, define whether to enable early_stop process. False or True.
 
 test:
