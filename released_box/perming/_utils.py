@@ -200,6 +200,20 @@ class BaseModel:
         self.test_loader = torch.utils.data.DataLoader(TabularDataset(test_['features'], test_['target'], roc), batch_size=self.batch_size, shuffle=True, num_workers=worker_set['test'])
         self.val_loader = torch.utils.data.DataLoader(TabularDataset(val_['features'], val_['target'], roc), batch_size=self.batch_size, shuffle=False, num_workers=worker_set['val'])
 
+    def set_freeze(self, require_grad: Dict[int, bool]):
+        '''
+        Freeze Network Layers of Trained Model by given `require_grad=False`.
+        :param require_grad: Dict[int, bool], whether to freeze grad on serial number of model layers.
+        '''
+        operat: bool = False
+        for name, param in self.model.named_parameters():
+            serial = int(name.strip('mlp.Linear.weight.bias'))
+            if serial in require_grad:
+                param.requires_grad = require_grad[serial]
+                operat: bool = True
+        if not operat:
+            raise ValueError('Please set require_grad states according to `self.model`.')
+
     def train_val(self, 
                   num_epochs: int=2,
                   interval: int=100,
