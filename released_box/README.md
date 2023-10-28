@@ -36,7 +36,7 @@ data_loader:
 - random_seed: *Optional[int]=None*, manually set any int value by users to fixed sequence.
 
 set_freeze:
-- require_grad: *Dict[int, bool]*, manually set freezed layers by given serial numbers according to `self.model`. (if users set require_grad with `{0: False}`, it means freeze the first layer of `self.model`.
+- require_grad: *Dict[int, bool]*, manually set freezed layers by given serial numbers according to `self.model`. (if users set require_grad with `{0: False}`, it means freeze the first layer of `self.model`.)
 
 train_val:
 - num_epochs: *int=2*, define numbers of epochs in main training cycle. any int value > 0.
