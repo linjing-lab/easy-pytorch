@@ -103,7 +103,7 @@ save or load:
 
 - Multi-classification
 
-|Multipler|Parameters|Meaning|
+|Mutipler|Parameters|Meaning|
 |--|--|--|
 |`__init__`|input_: int<br />num_classes: int<br />hidden_layer_sizes: Tuple[int]=(100,)<br />*<br />activation: str='relu'<br />criterion: str='CrossEntropyLoss'<br />solver: str='adam'<br />batch_size: int=32<br />learning_rate_init: float=1e-2<br />lr_scheduler: Optional[str]=None|Initialize Classifier Based on Basic Information of the Classification Dataset Obtained through Data Preprocessing and Feature Engineering with `num_classes>2`.|
 |print_config|/|Return Initialized Parameters of Multi-layer Perceptron and Graph.|
