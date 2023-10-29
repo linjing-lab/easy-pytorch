@@ -11,4 +11,4 @@ from typing import (
     Optional
 )
 
-TabularData = numpy.ndarray
+TabularData = numpy.ndarray # used as medium for storage format

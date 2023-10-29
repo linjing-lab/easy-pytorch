@@ -123,7 +123,7 @@ save or load:
 |data_loader|features: TabularData<br />labels: TabularData<br />ratio_set: Dict[str, int]={'train': 8, 'test': 1, 'val': 1}<br />worker_set: Dict[str, int]={'train': 8, 'test': 2, 'val': 1}<br />random_seed: Optional[int]=None|Using `ratio_set` and `worker_set` to Load the Multi-outputs Dataset with Numpy format into `torch.utils.data.DataLoader`.|
 |set_freeze|require_grad: Dict[int, bool]|freeze some layers by given `requires_grad=False` if trained model will be loaded to execute experiments.  |
 |train_val|num_epochs: int=2<br />interval: int=100<br />tolerance: float=1e-3<br />patience: int=10<br />backend: str='threading'<br />n_jobs: int=-1<br />early_stop: bool=False|Using `num_epochs`, `tolerance`, `patience` to Control Training Process and `interval` to Adjust Print Interval with Accelerated Validation Combined with `backend` and `n_jobs`.|
-|test|sort_by: str='accuracy'<br />sort_state: bool=True|Sort Returned Test Result about Correct Classes with `sort_by` and `sort_state` Which Only Appears in Classification.|
+|test|/|Test Module Only Show with Loss at 3 Stages: Train, Test, Val|
 |save|con: bool=True<br />dir: str='./model'|Save Trained Model Parameters with Model `state_dict` Control by `con`.|
 |load|con: bool=True<br />dir: str='./model'|Load Trained Model Parameters with Model `state_dict` Control by `con`.|
 

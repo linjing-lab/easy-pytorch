@@ -29,7 +29,7 @@ class MLP(torch.nn.Module):
     :param input_: int, input dataset with features' dimension of tabular data is input_.
     :param num_classes: int, total number of correct label categories or multi-outputs.
     :param hidden_layer_sizes: Tuple[int], configure the length and size of each hidden layer.
-    :param activation:, activation configured by Box, Regressier, Binarier, Multipler, and Ranker.
+    :param activation:, activation configured by Box, Regressier, Binarier, Mutipler, and Ranker.
     '''
     def __init__(self, input_: int, num_classes: int, hidden_layer_sizes: Tuple[int], activation) -> None:
         super(MLP, self).__init__()
@@ -83,18 +83,18 @@ class BaseModel:
         assert num_classes > 0, 'Supervised learning problems with num_classes ranges from (1, 2, 3, ...).'
         assert batch_size > 0, 'Batch size initialized with int value mostly 2^n(n=1, 2, 3), like 64, 128, 256.'
         assert learning_rate_init > 1e-6 and learning_rate_init < 1.0, 'Please assert learning rate initialized value in (1e-6, 1.0).'
-        self.input: int = input_
-        self.num_classes: int = num_classes
+        self.input: int = input_ # numbers of features described in one sample
+        self.num_classes: int = num_classes # numbers of prediction outputs
         self.activation = activation # function activate high-dimensional features
         self.device = device # device configuration
         self.criterion = criterion # criterion with classification & torch.long, regression & torch.float, and multi-outputs & roc
-        self.batch_size: int = batch_size
-        self.lr: float = learning_rate_init
+        self.batch_size: int = batch_size # batch size in train_loader, test_loader, val_loader
+        self.lr: float = learning_rate_init # initial learning rate in `self.solver` or `self.lr_scheduler`
         self.model = MLP(self.input, self.num_classes, hidden_layer_sizes, self.activation).to(self.device)
         if parse_torch_version(torch.__version__)[0] >= ['2', '0', '0']: # compile model
             self.model = torch.compile(self.model)
-        self.solver = self._solver(solver)
-        self.lr_scheduler = self._scheduler(lr_scheduler)
+        self.solver = self._solver(solver) # configuration of optimization algorithm
+        self.lr_scheduler = self._scheduler(lr_scheduler) # configuration compatible with `self.solver`
 
     def _solver(self, solver: str):
         '''
@@ -138,7 +138,7 @@ class BaseModel:
     def _val_acc(self, set: torch.Tensor):
         '''
         Accumulate Loss Value in Validation Stage.
-        :param set: torch.Tensor. unordered validation sets coming from val_dataloader.
+        :param set: torch.Tensor. unordered validation sets coming from val_loader.
         '''
         outputs_val = self.model(set[0].to(self.device)) # return value from cuda
         self.val_loss += self.criterion(outputs_val, set[1].to(self.device))
@@ -226,7 +226,7 @@ class BaseModel:
         Training and Validation with `train_loader` and `val_container`.
         :param num_epochs: int, training epochs for `self.model`. default: 2.
         :param interval: int, console output interval. default: 100.
-        :param tolerance: float, tolerance set to judge difference in val_loss. default: 1e-3
+        :param tolerance: float, tolerance set to judge difference in val_loss. default: 1e-3.
         :param patience: int, patience of no improvement waiting for training to stop. default: 10.
         :param backend: str, 'threading', 'multiprocessing', 'loky'. default: 'threading'.
         :param n_jobs: int, accelerate processing of validation. default: -1.
@@ -290,8 +290,8 @@ class BaseModel:
              sort_by: str='accuracy',
              sort_state: bool=True):
         '''
-        Configured keywords only work when `not self.is_target_2d and num_classes >= 2`.
-        Produce `self.aver_acc != 0` and 'correct_class != None' in the above condition.
+        Configured keywords only work in sorting `self.correct_class.items()` when `self.is_task_c1d = True`.
+        Produce `self.aver_acc != None` and 'correct_class != None' in the above conditions.
         :param sort_by: str, 'accuracy', 'numbers', 'num-total'. default: 'accuracy'.
         :param sort_state: bool, whether to use descending order when sorting. default: True.
         '''
