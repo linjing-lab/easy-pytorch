@@ -9,7 +9,7 @@ perming: Perceptron Models Are Training on Windows Platform with Default GPU Acc
 
 ## init backend
  
-refer to https://pytorch.org/get-started/locally/ and choose PyTorch that support `cuda` compatible with your Windows.
+refer to https://pytorch.org/get-started/locally/ and choose PyTorch to support `cuda` compatible with your Windows.
 
 tests with: PyTorch 1.7.1+cu101
 
@@ -140,6 +140,14 @@ pip install -e . --verbose
 download stable version:
 ```text
 pip install perming --upgrade
+```
+download versions without supported *early_stop*:
+```text
+pip install perming==1.3.1
+```
+download versions with supported *early_stop*:
+```text
+pip install perming>=1.4.1
 ```
 download version without enhancing *Parallel* and *delayed*:
 ```text
