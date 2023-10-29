@@ -141,3 +141,19 @@ download stable version:
 ```text
 pip install perming --upgrade
 ```
+download version without enhancing *Parallel* and *delayed*:
+```text
+pip install perming==1.6.1
+```
+download version with enhancing *Parallel* and *delayed*:
+```text
+pip install perming>=1.7.0
+```
+download version with supported *set_freeze*:
+```text
+pip install perming>=1.8.0
+```
+download version without crash of jupyter kernel:
+```text
+pip install perming>=1.8.1
+```
