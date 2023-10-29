@@ -91,13 +91,13 @@ class Box(BaseModel):
             return torch.nn.CrossEntropyLoss()
         elif criterion == 'NLLLoss':
             return torch.nn.NLLLoss()
-        elif criterion == 'MultiLabelSoftMarginLoss':
+        elif criterion == 'MultiLabelSoftMarginLoss': # multi-outputs
             return torch.nn.MultiLabelSoftMarginLoss()
         elif criterion == 'BCELoss': # classification with num_classes = 2
             return torch.nn.BCELoss()
-        elif criterion == 'BCEWithLogitsLoss':
+        elif criterion == 'BCEWithLogitsLoss': # multi-outputs
             return torch.nn.BCEWithLogitsLoss()
-        elif criterion == 'MSELoss': # regression
+        elif criterion == 'MSELoss': # regression (or multi-outputs)
             return torch.nn.MSELoss()
         elif criterion == 'L1Loss':
             return torch.nn.L1Loss()

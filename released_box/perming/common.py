@@ -174,7 +174,7 @@ class Mutipler(BaseModel):
                                        batch_size, 
                                        learning_rate_init, 
                                        lr_scheduler)
-        assert num_classes >= 2, 'The predefined options of Multipler are more suitable for Multi-classification.'
+        assert num_classes >= 2
 
     def _activate(self, activation: str):
         '''
