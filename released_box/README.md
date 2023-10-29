@@ -16,8 +16,8 @@ tests with: PyTorch 1.7.1+cu101
 ## advices
 
 - If users don't want to encounter *CUDA out of memory* return from *joblib.parallel*, the best solution is to download versions before v1.6.1.
-- If users have no plan to retrain a full network in tuning model, the best solution is to download versions after v1.8.0.
-- If users are not conducting experiments on Jupyter, download versions v1.7.* will accelerate project and reduce redundancy.
+- If users have no plan to retrain a full network in tuning model, the best solution is to download versions after v1.8.0 which support *set_freeze*.
+- If users are not conducting experiments on Jupyter, download versions after v1.7.* will accelerate *train_val* process and reduce redundancy.
 
 ## parameters
 
