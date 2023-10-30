@@ -317,7 +317,7 @@ class BaseModel:
 
     def save(self, con: bool=True, dir: str='./model') -> None:
         '''
-        Save Model Checkpoint with Box, Regressier, Binarier, Multipler, and Ranker.
+        Save Model Checkpoint with Box, Regressier, Binarier, Mutipler, and Ranker.
         :param con: bool, whether to print `model.state_dict()`. default: True.
         :param dir: str, model save to dir. default: './model'.
         '''
@@ -327,7 +327,7 @@ class BaseModel:
 
     def load(self, con: bool=True, dir: str='./model') -> None:
         '''
-        Load Model Checkpoint with Box, Regressier, Binarier, Multipler, and Ranker.
+        Load Model Checkpoint with Box, Regressier, Binarier, Mutipler, and Ranker.
         :param con: bool, whether to print `model.state_dict()`. default: True.
         :param dir: str, model load from dir. default: './model'.
         '''
