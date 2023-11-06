@@ -77,7 +77,7 @@ class Binarier(BaseModel):
     :param input_: int, input dataset with features' dimension of tabular data is input_.
     :param hidden_layer_sizes: Tuple[int], configure the size of each hidden layer. default: (100,).
     :param activation: str, configure function that activates the hidden layer. default: relu.
-    :param criterion: str, loss function determined by different learning problem. default: BCELoss.
+    :param criterion: str, loss function determined by different learning problem. default: CrossEntropyLoss.
     :param solver: str, optimization function coordinated with `torch.optim.lr_scheduler`. default: adam.
     :param batch_size: int, batch size of dataset in one training and validation process. default: 32.
     :param learning_rate_init: float, initialize the learning rate of the optimizer. default: 1e-2.
@@ -130,14 +130,14 @@ class Binarier(BaseModel):
     def _criterion(self, criterion: str):
         '''
         Configure Loss Criterion with `criterion`.
-        :param criterion: str, 'BCELoss', 'BCEWithLogitsLoss'. default: BCELoss.
+        :param criterion: str, 'CrossEntropyLoss', 'BCEWithLogitsLoss'. default: CrossEntropyLoss.
         '''
-        if criterion == 'BCELoss':
-            return torch.nn.BCELoss()
-        elif criterion == 'BCEWithLogitsLoss':
+        if criterion == 'CrossEntropyLoss':
+            return torch.nn.CrossEntropyLoss()
+        elif criterion == 'BCEWithLogitsLoss': # ! target and input need to be same size when adopt
             return torch.nn.BCEWithLogitsLoss()
         else:
-            raise ValueError("Criterion Configuration Supports Options: BCELoss, BCEWithLogitsLoss.")
+            raise ValueError("Criterion Configuration Supports Options: CrossEntropyLoss, BCEWithLogitsLoss.")
 
 class Mutipler(BaseModel):
     '''

@@ -92,7 +92,7 @@ save or load:
 
 |Binarier|Parameters|Meaning|
 |--|--|--|
-|`__init__`|input_: int<br />hidden_layer_sizes: Tuple[int]=(100,)<br />*<br />activation: str='relu'<br />criterion: str='BCELoss'<br />solver: str='adam'<br />batch_size: int=32<br />learning_rate_init: float=1e-2<br />lr_scheduler: Optional[str]=None|Initialize Classifier Based on Basic Information of the Classification Dataset Obtained through Data Preprocessing and Feature Engineering with `num_classes=2`.|
+|`__init__`|input_: int<br />hidden_layer_sizes: Tuple[int]=(100,)<br />*<br />activation: str='relu'<br />criterion: str='CrossEntropyLoss'<br />solver: str='adam'<br />batch_size: int=32<br />learning_rate_init: float=1e-2<br />lr_scheduler: Optional[str]=None|Initialize Classifier Based on Basic Information of the Classification Dataset Obtained through Data Preprocessing and Feature Engineering with `num_classes=2`.|
 |print_config|/|Return Initialized Parameters of Multi-layer Perceptron and Graph.|
 |data_loader|features: TabularData<br />labels: TabularData<br />ratio_set: Dict[str, int]={'train': 8, 'test': 1, 'val': 1}<br />worker_set: Dict[str, int]={'train': 8, 'test': 2, 'val': 1}<br />random_seed: Optional[int]=None|Using `ratio_set` and `worker_set` to Load the Binary-classification Dataset with Numpy format into `torch.utils.data.DataLoader`.|
 |set_freeze|require_grad: Dict[int, bool]|freeze some layers by given `requires_grad=False` if trained model will be loaded to execute experiments.  |
@@ -150,7 +150,7 @@ download versions with supported *early_stop*:
 pip install perming>=1.4.1
 ```
 download versions with supported *early_stop* in epoch:
-```python
+```text
 pip install perming>=1.4.2
 ```
 download version without enhancing *Parallel* and *delayed*:
