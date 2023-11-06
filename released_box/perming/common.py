@@ -88,7 +88,7 @@ class Binarier(BaseModel):
                  hidden_layer_sizes: Tuple[int]=(100,),
                  *,
                  activation: str='relu', 
-                 criterion: str='BCELoss',
+                 criterion: str='CrossEntropyLoss',
                  solver: str='adam', 
                  batch_size: int=32, 
                  learning_rate_init: float=1e-2,
