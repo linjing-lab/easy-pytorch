@@ -3,7 +3,7 @@
 import torch, random, numpy, gc
 from joblib import parallel_backend, Parallel, delayed
 from collections import OrderedDict
-from ._typing import TabularData, Tuple, Dict, Optional, Any
+from ._typing import TabularData, List, Tuple, Dict, Optional, Any
 from ._version import parse_torch_version
 
 class TabularDataset(torch.utils.data.Dataset):
@@ -135,10 +135,10 @@ class BaseModel:
             else:
                 raise ValueError("Learning Rate Scheduler Supports Options: exponential_lr, step_lr, multi_step_lr, cosine_annealing_lr.")
             
-    def _val_acc(self, set: torch.Tensor):
+    def _val_acc(self, set: List[torch.Tensor]):
         '''
         Accumulate Loss Value in Validation Stage.
-        :param set: torch.Tensor. unordered validation sets coming from val_loader.
+        :param set: List[torch.Tensor]. unordered validation sets coming from val_loader.
         '''
         outputs_val = self.model(set[0].to(self.device)) # return value from cuda
         self.val_loss += self.criterion(outputs_val, set[1].to(self.device))

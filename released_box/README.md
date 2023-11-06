@@ -149,6 +149,10 @@ download versions with supported *early_stop*:
 ```text
 pip install perming>=1.4.1
 ```
+download versions with supported *early_stop* in epoch:
+```python
+pip install perming>=1.4.2
+```
 download version without enhancing *Parallel* and *delayed*:
 ```text
 pip install perming==1.6.1
