@@ -135,13 +135,12 @@ class BaseModel:
             else:
                 raise ValueError("Learning Rate Scheduler Supports Options: exponential_lr, step_lr, multi_step_lr, cosine_annealing_lr.")
             
-    def _val_acc(self, set: List[torch.Tensor]):
+    def _val_acc(self, val_set: List[torch.Tensor]):
         '''
         Accumulate Loss Value in Validation Stage.
-        :param set: List[torch.Tensor]. unordered validation sets coming from val_loader.
+        :param val_set: List[torch.Tensor]. unordered validation sets coming from val_loader.
         '''
-        outputs_val = self.model(set[0].to(self.device)) # return value from cuda
-        self.val_loss += self.criterion(outputs_val, set[1].to(self.device))
+        self.val_loss += self.criterion(self.model(val_set[0].to(self.device)), val_set[1].to(self.device))
 
     def print_config(self):
         '''
