@@ -1,7 +1,7 @@
 # Copyright (c) 2023 linjing-lab
 
 import torch, random, numpy, gc
-from joblib import parallel_backend, Parallel, delayed
+from joblib import parallel_config, Parallel, delayed
 from collections import OrderedDict
 from ._typing import TabularData, List, Tuple, Dict, Optional, Any
 from ._version import parse_torch_version
@@ -220,6 +220,7 @@ class BaseModel:
                   patience: int=10, 
                   backend: str='threading', 
                   n_jobs: int=-1,
+                  prefer: str='threads',
                   early_stop: bool=False) -> None:
         '''
         Training and Validation with `train_loader` and `val_container`.
@@ -229,6 +230,7 @@ class BaseModel:
         :param patience: int, patience of no improvement waiting for training to stop. default: 10.
         :param backend: str, 'threading', 'multiprocessing', 'loky'. default: 'threading'.
         :param n_jobs: int, accelerate processing of validation. default: -1.
+        :param prefer: str, set 'threads' when 'threading' and set 'processes' when 'multiprocessing' or 'loky'. default: 'threads'.
         :param early_stop: bool, whether to enable early_stop in train_val. default: False.
         '''
         assert num_epochs > 0 and interval > 0, 'With num_epochs > 0 and interval > 0 to train parameters into outputs.'
@@ -258,7 +260,7 @@ class BaseModel:
 
                 # validation with val_container
                 self.val_loss = 0 # int value at cpu
-                with parallel_backend(backend, n_jobs=n_jobs):
+                with parallel_config(backend, n_jobs=n_jobs, prefer=prefer):
                     Parallel()(delayed(self._val_acc)(val_set) for val_set in self.val_container)     
                 self.val_loss /= val_length
                 val_counts = i + 1 + total_step * epoch # times of val_loss renewed
