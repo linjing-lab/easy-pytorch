@@ -401,6 +401,7 @@ def train_test_val_split(features: TabularData, target: TabularData, ratio_set: 
     indices_train = numpy.array(indices[:num_train])
     indices_test = numpy.array(indices[num_train: num_train + num_test])
     indices_val = numpy.array(indices[num_train + num_test: num_train + num_test + num_val])
+    # indices_val = numpy.array(indices[num_train + num_test:]) # if not want to loss sample in validation
     train_dict['features'], train_dict['target'] = features[indices_train], target[indices_train]
     test_dict['features'], test_dict['target'] = features[indices_test], target[indices_test]
     val_dict['features'], val_dict['target'] = features[indices_val], target[indices_val]
