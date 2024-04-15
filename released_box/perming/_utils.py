@@ -298,7 +298,7 @@ class BaseModel:
         '''
         with torch.no_grad():
             self.test_loss, test_loader_step, correct = 0, len(self.test_loader), 0
-            test_total = test_loader_step * self.batch_size
+            test_total = test_loader_step * self.batch_size # replace with len(self.test_loader.dataset) to use concise numbers
             self.correct_class = dict.fromkeys(self.unique, [0, 0]) if self.is_task_c1d else None
             for features, target in self.test_loader:
                 features = features.to(self.device)
