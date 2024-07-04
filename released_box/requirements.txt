@@ -6,3 +6,4 @@ chembl_webresource_client>=0.10.9
 padelpy>=0.1.14
 seaborn>=0.11.2
 pandas>=1.2.4
+selfies>=2.1.1
