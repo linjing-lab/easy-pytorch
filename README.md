@@ -6,7 +6,7 @@
     </a>
 </p>
 
-这是一个快速入门 PyTorch 框架的学习仓库，包括 PyTorch 的基本用法与常用模型的搭建等。
+这是 PyTorch 的基本用法与常用模型的搭建等，分类和回归任务是基于经典模型的增强表征和基准提高。
 
 ## 目录
 
@@ -29,8 +29,6 @@
 |[Object Detection](./notebooks/video_detection.ipynb)|[VIDEOS](./data/VIDEOS/input/)|/|基于YOLOv5s模型的目标检测|
 
 </div>
-
-These cases were trained on NVIDIA GeForce MX250.
 
 ## LICENSE
 
