@@ -1,11 +1,5 @@
 # easy-pytorch🔖
 
-<p align='center'>
-    <a href="https://pytorch.org/"> 
-        <img src="https://www.vectorlogo.zone/logos/pytorch/pytorch-icon.svg"> 
-    </a>
-</p>
-
 这是 PyTorch 的基本用法与常用模型的搭建等，分类和回归任务是基于经典模型的增强表征和基准提高。
 
 ## 目录
@@ -19,9 +13,9 @@
 |[逻辑回归](./notebooks/logistic_regression.ipynb)|[MNIST](./data/MNIST/)|92.17%||
 |[前馈神经网络](./notebooks/feedforward_neural_network.ipynb)|[MNIST](./data/MNIST/)|97.16%|前向传播|
 |[卷积神经网络](./notebooks/convolutional_neural_network.ipynb)|[MNIST](./data/MNIST/)|98.8%||
-|[LeNet-5](./notebooks/lenet-5.ipynb)|[MNIST](./data/MNIST/)|99.04%|用于银行柜机手写数字识别的CNN模型|
-|[循环神经网络](./notebooks/recurrent_neural_network.ipynb)|[MNIST](./data/MNIST/)|97.01%|用于处理和预测时序数据|
-|[AlexNet](./notebooks/alexnet.ipynb)|[CIFAR10](./data/CIFAR10/)|86.1%|ImageNet比赛提出一个5层CNN模型|
+|[LeNet-5](./notebooks/lenet-5.ipynb)|[MNIST](./data/MNIST/)|99.04%|手写数字识别的CNN模型|
+|[循环神经网络](./notebooks/recurrent_neural_network.ipynb)|[MNIST](./data/MNIST/)|97.01%|处理和预测时序数据|
+|[AlexNet](./notebooks/alexnet.ipynb)|[CIFAR10](./data/CIFAR10/)|86.1%|ImageNet比赛提出的5层CNN模型|
 |[VGGNet](./notebooks/vggnet.ipynb)|[CIFAR10](./data/CIFAR10/)|VGG-16: 92.23%<br />VGG-19: 91.99%|加深版的AlexNet|
 |[GoogLeNet](./notebooks/googlenet.ipynb)|[CIFAR10](./data/CIFAR10/)|aux_logits=True: 86.99%<br />aux_logits=False: 85.88%|首次引入Inception结构|
 |[ResNet](./notebooks/resnet.ipynb)|[CIFAR10](./data/CIFAR10/)|89.89%|引入残差块|
