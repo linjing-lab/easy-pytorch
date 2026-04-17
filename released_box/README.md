@@ -1,5 +1,17 @@
 # perming
 
+<p align='center'>
+    <a href='https://pepy.tech/project/perming'>
+        <img src="https://pepy.tech/badge/perming" alt="Total Downloads" height="20"/>
+    </a>
+    <a href='https://pepy.tech/project/perming'>
+        <img src="https://pepy.tech/badge/perming/month" alt="Monthly Downloads" height="20"/> 
+    </a>
+    <a href='https://pepy.tech/project/perming'>
+        <img src="https://pepy.tech/badge/perming/week" alt="Weekly Downloads" height="20"/> 
+    </a>
+</p>
+
 perming: Perceptron Models Are Training on Windows Platform with Default GPU Acceleration.
 
 - p: use polars or pandas to read dataset.
