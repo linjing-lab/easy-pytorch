@@ -186,3 +186,19 @@ download version with optimized _val_acc (avoid *CUDA out of memory* which may o
 ```text
 pip install perming==1.9.2
 ```
+## reference
+
+```bibtex
+@software{perming,
+  author       = {Lin, Jing},
+  title        = {perming: The supervised learning framework based on perceptron for tabular data.},
+  version      = {1.9.3},
+  year         = {2023},
+  month        = {11},
+  publisher    = {PyPI},
+  organization = {linjing-lab},
+  url          = {https://pypi.org/project/perming/},
+  license      = {MPL-2.0},
+  note         = {Source code available at \url{https://github.com/linjing-lab/easy-pytorch/tree/main/released_box}}
+}
+```
